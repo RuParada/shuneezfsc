@@ -1,0 +1,60 @@
+<?php $__env->startSection('content'); ?>
+
+<?php if(Session::has('error')): ?> <?php $error = Session::get('error'); ?> <?php endif; ?>
+<div class="content-wrapper">
+
+    <section class="content-header">
+        <h1><?php echo trans('messages.Edit Address Type'); ?> </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-8">
+
+                <div class="box">
+
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><?php echo trans('messages.Edit the below fields'); ?></h3>
+                    </div><!--box-header-->
+
+                    <?php echo Form::open(array('url' => 'admin/update_addresstype', 'class' => 'form-horizontal')); ?>
+
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="addresstype" class="col-sm-3 control-label"><?php echo trans('messages.Address Type'); ?> <span class="req">*</span></label>
+                            <div class="col-sm-9">
+                                <input type="text" maxlength='75' name="addresstype" class="form-control" id="addresstype" placeholder="<?php echo trans('messages.Address Type'); ?> " value="<?php echo (Input::old('addresstype')) ? Input::old('addresstype') : $addresstype->addresstype; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('addresstype') != '') ? $error->first('addresstype') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="status" class="col-sm-3 control-label"><?php echo trans('messages.Status'); ?> <span class="req">*</span></label>
+                            <div class="col-sm-9 radio_btns">
+                                <input type="radio" name="status" value="1" checked><?php echo trans('messages.Active'); ?>
+                                <input type="radio" name="status" value="0" <?php echo (Input::old('status') == '0' || $addresstype->status == 0) ? 'checked' : ''; ?>><?php echo trans('messages.Inactive'); ?>
+                            </div>
+                        </div>
+                        
+                    </div><!--box-body-->
+
+                    <div class="box-footer">
+                        <input type="hidden" name="id" value="<?php echo $addresstype->id; ?>">
+                        <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o"></i><?php echo trans('messages.Update Address Type'); ?></button>
+                        <button type="reset" class="btn pull-right"><i class="fa fa-refresh"></i><?php echo trans('messages.Reset'); ?></button>
+                        <button type="button" onclick="window.location.href = '<?php echo URL::to('admin/addresstype'); ?>'" class="btn pull-right"><i class="fa fa-chevron-left"></i><?php echo trans('messages.Cancel'); ?></button>
+                    </div><!-- box-footer -->
+                    <?php echo Form::close(); ?>
+
+
+                </div><!--box-info-->
+
+            </div></div>      
+
+    </section><!-- /.content -->
+</div><!-- /.content-wrapper -->
+
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('adminheader', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

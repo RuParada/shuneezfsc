@@ -1,0 +1,230 @@
+<?php $__env->startSection('content'); ?>
+<?php if(Session::has('error')): ?> <?php $error = Session::get('error') ?> <?php endif; ?>
+<?php 
+$products             = Cart::content();
+$ingredient_subtotal  = 0; 
+$ingredient_total     = 0;
+$service_tax          = 0;
+$total                = 0;
+?>
+<div class="container">
+  <div class="checkout-pg">
+  <div class="bred1">
+	<img src="<?php echo URL::to('assets/images/back-btn.png'); ?>" class="bred"><a href="<?php echo URL::to('listings'); ?>"><?php echo trans('frontend.Back'); ?></a>
+  </div>
+	</div>
+</div>
+<div id="exTab2" class="container"> 
+<ul class="nav nav-tabs custom_ckout">
+      <li>
+        <a  href="#1" data-toggle="tab"><?php echo trans('frontend.Your Order'); ?></a>
+      </li>
+      <li class="active" style="width:50%;text-align:center;"><a href="#2" data-toggle="tab"><?php echo trans('frontend.Secure Checkout'); ?></a>
+      </li>
+</ul>
+
+      <div class="tab-content ">
+        <div class="tab-pane active" id="1">
+
+          <div class="container ck_2" style="margin-bottom:30px;">
+         
+        <div class="col-md-12 ck_1">
+        <div class="checkout_box table-responsive">
+       <table style="width:100%;">
+  <tbody>
+    <tr class="bor">
+      <th><?php echo trans('frontend.S.No'); ?></th>
+      <th><?php echo trans('frontend.Item Name'); ?></th>
+      <th></th>
+      <th></th>
+      <th><?php echo trans('frontend.Price'); ?></th>
+    </tr>
+    <?php if(count($products)) { 
+		$i = 1;
+		foreach($products as $product) { 
+			$ingredient_subtotal = 0; 
+	?>
+    <tr class="bor">
+      <td><p class="check_txt" style="margin-left:10px;"><?php echo $i++; ?></p></td>
+      <td>
+      <p class="check_txt"><?php echo $product->name; ?></p>
+      <div class="tes1">
+      <button type="button" class="checkout-minusbtn" onclick="updateqty(<?php echo $product->id; ?>, 'remove');">-</button>  
+              <input class="mn" type="text" name="quantity" id="quantity_<?php echo $product->id; ?>" value="<?php echo $product->qty; ?>" >
+              <button type="button" class="checkout-plusbtn" onclick="updateqty(<?php echo $product->id; ?>, 'add');">+</button>
+              <span class="btns yellow" style="display:none; cursor:pointer" id="update_cart<?php echo $product->id; ?>" onclick="update_cart(<?php echo $product->id; ?>,'<?php echo $product->rowid; ?>')"><i class="fa fa-refresh"></i>Update</span>
+              </td>
+              
+              </div>
+              
+      <td>
+		  <?php 
+		  if($product->options->is_ingredients) 
+		  { 
+			for($i=0; $i<count($product->options->ingredientlist); $i++) 
+			{ 
+				$ingredient_subtotal += $product->options->ingredient_price[$i];
+				echo $product->options->ingredientlist[$i].' : $'.$product->options->ingredient_price[$i].'<br>';
+			}
+		  }
+		  ?>
+	  </td>
+      <td></td>
+      <td><p class="check_txt"><?php echo $default_currency.' '.$product->price; ?></p></td>
+    </tr>
+    <?php 
+		$ingredient_total += $ingredient_subtotal*$product->qty; 
+		} 
+		$vat_tax = (((Cart::total() + $ingredient_total) * $config_data['vat']) / 100); 
+		$total = Cart::total() + Session('orders.delivery_fee') + $ingredient_total + $vat_tax;
+	?>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td style="color:#999;font-size:16px;"><?php echo trans('frontend.Sub Total'); ?></td>
+      <td style="color:#999;font-size:16px;"><?php echo $default_currency.' '.(Cart::total() + $ingredient_total); ?></td>
+      
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td style="color:#999;font-size:16px;"><?php echo trans('frontend.Delivery Fee'); ?></td>
+      <td style="color:#999;font-size:16px;"><?php echo $default_currency.' '.Session('orders.delivery_fee'); ?></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td style="color:#999;font-size:16px;"><?php echo trans('frontend.Vat Tax'); ?></td>
+      <td style="color:#999;font-size:16px;"><?php echo $default_currency.' '.$vat_tax; ?></td>
+     
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td ><p class="check_txt1"><?php echo trans('frontend.Total'); ?></p></td>
+      <td><p class="check_txt1"><?php echo $default_currency.' '.$total; ?></p></td>
+      
+    </tr>
+    <?php } ?>
+  </tbody>
+</table>
+</div>
+</div>
+<?php echo Form::open(array('url' => 'getdelivery_time')); ?>
+
+        <div class="order_in">
+         <p class="check_txt"><?php echo trans('frontend.Order Information'); ?></p>
+		<input type="radio" name="delivery_type" id="delivery" class="css-checkbox-radio" value="d" checked />
+            <label for="delivery" class="css-label radGroup1"><?php echo trans('frontend.Delivery'); ?></label><br>
+        <hr>
+            <input type="radio" name="delivery_type" id="pickup" class="css-checkbox-radio" value="p" <?php echo (Session('orders.delivery_type') == 'p' || Input::old('delivery_type') == 'p') ? 'checked' : ''; ?>/>
+            <label for="pickup"  class="css-label radGroup1"><?php echo trans('frontend.Pickup'); ?> </label><br>
+            <?php if(Session::has('service_error')): ?><span class="error_msg"> <?php echo Session::get('service_error'); ?></span><?php endif; ?>
+		
+	     <hr>
+	     
+         </div>
+	<div class="date-time">
+         <p class="check_txt"><?php echo trans('frontend.Date'); ?> & <?php echo trans('frontend.Time'); ?></p>
+
+			<input value="0" type="radio" onclick="getdelivery_time();" id="today_delivery" name="delivery" class="css-checkbox-radio" checked="checked" />
+            <label for="today_delivery" class="css-label radGroup1"><?php echo trans('frontend.Now'); ?></label>
+			<input value="1" type="radio" onclick="getdelivery_time();" id="later_delivery" name="delivery" class="css-checkbox-radio " <?php echo (Input::old('delivery') == 1) ? 'checked' : ''; ?> />
+            <label for="later_delivery" class="css-label radGroup1 rd_agn"><?php echo trans('frontend.Later'); ?></label>
+            
+            <div id="selctdate" style="display:<?php echo (Input::old('delivery') == 1) ? 'block': 'none'; ?>">
+				<input type="text" name="delivery_date" class="form-control new_txt" id="dpicToday" placeholder="Date Picker" value="<?php echo (Input::old("delivery_date") != '') ? date('d-m-Y', strtotime(Input::old("delivery_date"))) : ''; ?>">
+				<?php if(Session::has('error')): ?><span class="error_msg"> <?php echo ($error->first('delivery_date') != '') ? $error->first('delivery_date') : ''; ?></span><?php endif; ?>
+				<?php if(Session::has('time_error')): ?><span class="error_msg"> <?php echo Session::get('time_error'); ?></span><?php endif; ?>
+				<input type="text" class="form-control new_txt clock_picker" placeholder="Time Picker" name="delivery_time" value="<?php echo Input::old('delivery_time'); ?>">
+				<?php if(Session::has('error')): ?><span class="error_msg"> <?php echo ($error->first('delivery_time') != '') ? $error->first('delivery_time') : ''; ?></span><?php endif; ?>
+			</div>
+     </div>
+	   
+
+
+	 <br>
+     <div class="clr"></div>
+<input type="hidden" name="subtotal" value="<?php echo Cart::total() + $ingredient_total; ?>">
+<input type="hidden" name="vat" value="<?php echo $vat_tax; ?>">    
+<input type="hidden" name="total" value="<?php echo $total; ?>">
+<div class="col-md-3 ckpadl ckpadr" style="padding-left:0px;"><button type="submit" class="ch-out-btn pad_top "><?php echo trans('frontend.Checkout'); ?></button></div>
+
+</div>
+<?php echo Form::close(); ?>          
+        </div>
+        
+
+  <!--<label><input type="checkbox" value="">I have read and accepted the Terms and Conditions</label>
+</div>
+<div class="checkbox">
+  <label><input type="checkbox" value="">I Would like to subscribe for Newsletter</label>
+</div>
+<div class="checkbox">
+  <label><input type="checkbox" value="">I Would like to receive promos from Shunez through</label>-->
+</div>
+</div>
+<script>
+	function update_cart(id,rowid)
+	{
+		var qty = $("#quantity_"+id).val();
+		$.ajax({
+		beforeSend : function() {
+			$("body").addClass("loading");
+		},
+		type : "GET",
+		dataType : "json",
+		url  : "<?php echo URL::to('update_cart'); ?>",
+		data : {'rowid' : rowid, 'qty' : qty},
+		async: true,
+		success: function(result) {
+					$("body").removeClass("loading");
+					window.location.reload();
+				}
+			});
+	}
+	
+	function remove_product(rowid)
+	{
+		var url = "<?php echo URL::to(''); ?>"; 
+		if(confirm('Are you sure you want remove this product?'))
+		{
+			window.location.href = url+'/remove_product/'+rowid;
+		}
+	}
+	
+	function updateqty(id, action)
+	{
+		var qty = $("#quantity_"+id).val();
+		if(action == 'add')
+		{
+			var newqty = parseInt(qty) + 1;
+			$("#quantity_"+id).val(newqty);
+		}
+		else
+		{
+			var newqty = parseInt(qty) - 1;
+			newqty = (newqty < 1) ? 1 : newqty; 
+			$("#quantity_"+id).val(newqty);
+		}
+		$("#update_cart"+id).css('display','block');
+		
+	}
+	
+	function getdelivery_time()
+	{	if ($("#today_delivery").prop("checked")) {
+			$("#selctdate").css('display', 'none');
+        }
+        else{ 
+          $("#selctdate").css('display', 'block');
+        }
+        
+    }
+</script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('header', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

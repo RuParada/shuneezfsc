@@ -1,0 +1,440 @@
+<?php $__env->startSection('content'); ?>
+<?php if(Session::has('error')): ?> <?php $error = Session::get('error'); ?> <?php endif; ?>
+<div class="content-wrapper">
+
+    <section class="content-header">
+        <h1><?php echo trans('messages.Admin Configuration'); ?> <button onclick="window.history.back();" class="btn btn-primary pull-right"><i class="fa fa-chevron-left"></i>Back</button></h1>
+        <?php if(Session::has('success')): ?><p class="success_msg"><?php echo Session::get('success'); ?></p><?php endif; ?>
+    </section>
+
+    <!-- Main content -->
+    <section class="content settings">
+        <div class="row">
+
+            <div class="col-md-6">    
+                <div class="box">
+
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><?php echo trans('messages.Admin Settings'); ?></h3>
+                    </div><!--box-header-->	
+                    <?php echo Form::open(array('url' => 'admin/updateadmin')); ?>
+
+                    <div class="box-body two_col_form">
+                        <div class="col-sm-6 left">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Username'); ?><span class="req">*</span></label>
+                                <input type="text" name="username" class="form-control" value="<?php echo (Session::has('new_username')) ? Session('new_username') : Session('username'); ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('username') != '') ? $error->first('username') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>	
+
+                        <div class="col-sm-6 right">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Password'); ?></label>
+                                <input type="password" name="password" class="form-control" >
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('password') != '') ? $error->first('password') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 left">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Display Name'); ?><span class="req">*</span></label>
+                                <input type="text" name="name" class="form-control" value="<?php echo (Session::has('new_name')) ? Session('new_name') : Session('name'); ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('name') != '') ? $error->first('name') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 right">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Email'); ?><span class="req">*</span></label>
+                                <input type="text" name="email" class="form-control" value="<?php echo (Session::has('new_email')) ? Session('new_email') : Session('email'); ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('email') != '') ? $error->first('email') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+
+                    </div><!--box-body-->  
+
+                    <div class="box-footer">
+                        <input type="hidden" name="id" value="<?php echo Session('admin_userid'); ?>">
+                        <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o"></i><?php echo trans('messages.Update Settings'); ?></button>
+                    </div><!-- box-footer -->
+                    <?php echo Form::close(); ?>
+
+                </div><!--box-->	
+
+                <div class="box">
+                    <?php
+                    if (count($smtp_settings) > 0) {
+                        foreach ($smtp_settings as $smtp_setting) {
+                            $config[$smtp_setting->setting_name] = $smtp_setting->setting_value;
+                        }
+                    }
+                    ?>	
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><?php echo trans('messages.SMTP Settings'); ?></h3>
+                    </div><!--box-header-->	
+                    <?php echo Form::open(array('url' => 'admin/updatesmtp_settings')); ?>
+
+                    <div class="box-body two_col_form">
+                        <div class="col-sm-6 left">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.SMTP Host'); ?><span class="req">*</span></label>
+                                <input type="text" name="host" class="form-control" value="<?php echo (Input::old('host') != '') ? Input::old('host') : $config['host']; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('host') != '') ? $error->first('host') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>	
+
+                        <div class="col-sm-6 right">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.SMTP Username'); ?><span class="req">*</span></label>
+                                <input type="text" name="smtp_username" class="form-control" value="<?php echo (Input::old('smtp_username') != '') ? Input::old('smtp_username') : $config['smtp_username']; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('smtp_username') != '') ? $error->first('smtp_username') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 left">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.SMTP Password'); ?><span class="req">*</span></label>
+                                <input type="password" name="smtp_password" class="form-control" value="<?php echo (Input::old('smtp_password') != '') ? Input::old('smtp_password') : $config['smtp_password']; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('smtp_password') != '') ? $error->first('smtp_password') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 right">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.SMTP Port'); ?><span class="req">*</span></label>
+                                <input type="text" name="port" class="form-control" value="<?php echo (Input::old('port') != '') ? Input::old('port') : $config['port']; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('port') != '') ? $error->first('port') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 left">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Transport Layer Security'); ?><span class="req">*</span></label>
+                                <input type="text" name="security" class="form-control" value="<?php echo (Input::old('security') != '') ? Input::old('security') : $config['security']; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('security') != '') ? $error->first('security') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+
+                    </div><!--box-body-->  
+
+                    <div class="box-footer">
+                        <input type="hidden" name="id" value="<?php echo Session('admin_userid'); ?>">
+                        <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o"></i><?php echo trans('messages.Update Settings'); ?></button>
+                    </div><!-- box-footer -->
+                    <?php echo Form::close(); ?>
+
+                </div><!--box-->
+                
+                	
+
+					<?php
+					if (count($settings) > 0) {
+						foreach ($settings as $setting) {
+							$config_data[$setting->setting_name] = $setting->setting_value;
+						}
+					}
+					?>					
+                  <div class="box">
+
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><?php echo trans('messages.Image Settings'); ?></h3>
+                    </div><!--box-header-->	
+                    <?php echo Form::open(array('url' => 'admin/updateimage_settings', 'files' => 1)); ?>
+
+                    <div class="box-body two_col_form">
+                        <div class="form-group">
+                            <label class="col-sm-6 control-label"><?php echo trans('messages.Upload Logo'); ?> </label>
+                            <div class="col-sm-6">
+                                <input type="file" name="logo" class="form-control upload_hide" id="upload_logo">
+                                <label for="upload_logo" class="upload_lbl">
+                                    <img src="<?php echo URL::to(($config_data['logo'] != '') ? 'assets/uploads/settings/' . $config_data['logo'] : 'assets/admin/images/not-found.png'); ?>" class="logoimg">
+                                </label><br>
+                                <span class="error_msg" id="error"><?php if(Session::has('error')): ?><?php echo ($error->first('logo') != '') ? $error->first('logo') : ''; ?><?php endif; ?></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-6 control-label"><?php echo trans('messages.Upload Favicon'); ?> </label>
+                            <div class="col-sm-6">
+                                <input type="file" name="favicon" class="form-control upload_hide" id="upload_favicon">
+                                <label for="upload_favicon" class="upload_lbl">
+                                    <img src="<?php echo URL::to(($config_data['favicon'] != '') ? 'assets/uploads/settings/' . $config_data['favicon'] : 'assets/admin/images/not-found.png'); ?>" class="faviconimg">
+                                </label><br>
+                                <span class="error_msg" id="error"><?php if(Session::has('error')): ?><?php echo ($error->first('favicon') != '') ? $error->first('favicon') : ''; ?><?php endif; ?></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-6 control-label"><?php echo trans('messages.Upload Noimage'); ?> </label>
+                            <div class="col-sm-6">
+                                <input type="file" name="image" class="form-control upload_hide" id="upload_img">
+                                <label for="upload_img" class="upload_lbl">
+                                    <img src="<?php echo URL::to(($config_data['noimage'] != '') ? 'assets/uploads/settings/' . $config_data['noimage'] : 'assets/admin/images/not-found.png'); ?>" class="roundedimg">
+                                </label><br>
+                                <span class="error_msg" id="error"><?php if(Session::has('error')): ?><?php echo ($error->first('image') != '') ? $error->first('image') : ''; ?><?php endif; ?></span>
+                            </div>
+                        </div>
+
+                    </div><!--box-body-->  
+
+                    <div class="box-footer">
+                        <input type="hidden" name="id" value="<?php echo Session('admin_userid'); ?>">
+                        <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o"></i><?php echo trans('messages.Update Settings'); ?></button>
+                    </div><!-- box-footer -->
+                    <?php echo Form::close(); ?>
+
+                </div><!--box-->
+
+            </div><!--col-md-8-->
+
+            <div class="col-md-6">    
+                <div class="box">
+
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><?php echo trans('messages.Website Contact'); ?></h3>
+                    </div><!--box-header-->
+                    <?php echo Form::open(array('url' => 'admin/updatesite_settings')); ?>
+
+                    <div class="box-body two_col_form">
+
+                        <div class="col-sm-6 left">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Email ID'); ?></label>
+                                <input type="text" name="email" class="form-control" value="<?php echo (Input::old('email') != '') ? Input::old('email') : $config_data['email']; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('email') != '') ? $error->first('email') : ''; ?></p><?php endif; ?> 
+                            </div>
+                        </div>	
+
+                        <div class="col-sm-6 right">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Mobile'); ?></label>
+                                <input type="text" name="mobile" class="form-control" value="<?php echo (Input::old('mobile') != '') ? Input::old('mobile') : $config_data['mobile']; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('mobile') != '') ? $error->first('mobile') : ''; ?></p><?php endif; ?> 
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-12 plr0">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Copyright'); ?></label>
+                                <input type="text" name="copyright" class="form-control" value="<?php echo (Input::old('copyright') != '') ? Input::old('copyright') : $config_data['copyright']; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('copyright') != '') ? $error->first('copyright') : ''; ?></p><?php endif; ?> 
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 plr0">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Address'); ?></label>
+                                <textarea name="address" class="form-control"><?php echo (Input::old('address') != '') ? Input::old('address') : $config_data['address']; ?></textarea>
+                            </div>
+                        </div>
+                        <h4 class="subhead"><?php echo trans('messages.Meta Details'); ?></h4>
+                        <div class="col-sm-12 left">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Meta Keyword'); ?></label>
+                                <input type="text" name="meta_keyword" class="form-control" value="<?php echo (Input::old('meta_keyword') != '') ? Input::old('meta_keyword') : $config_data['meta_keyword']; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('meta_keyword') != '') ? $error->first('meta_keyword') : ''; ?></p><?php endif; ?> 
+                            </div>
+                        </div>	
+
+
+                        <div class="col-sm-12 plr0">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Meta Description'); ?></label>
+                                <textarea name="meta_description" class="form-control"><?php echo (Input::old('meta_description') != '') ? Input::old('meta_description') : $config_data['meta_description']; ?></textarea>
+                            </div>
+                        </div>
+
+                        <h4 class="subhead"><?php echo trans('messages.Social Links'); ?></h4>
+
+                        <div class="col-sm-6 left">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Facebook'); ?></label>
+                                <input type="text" name="facebook" class="form-control" value="<?php echo (Input::old('facebook') != '') ? Input::old('facebook') : $config_data['facebook']; ?>">
+                            </div>
+                        </div>	
+
+                        <div class="col-sm-6 right">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Twitter'); ?></label>
+                                <input type="text" name="twitter" class="form-control" value="<?php echo (Input::old('twitter') != '') ? Input::old('twitter') : $config_data['twitter']; ?>">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 left">					
+                            <div class="form-group">
+                                <label class="control-label"><?php echo trans('messages.Google+'); ?></label>
+                                <input type="text" name="googleplus" class="form-control" value="<?php echo (Input::old('googleplus') != '') ? Input::old('googleplus') : $config_data['googleplus']; ?>">
+                            </div>
+                        </div>
+                        
+                        <table class="other_settings">
+					<tr>
+						<th><?php echo trans('messages.Configuration Items'); ?></th>
+						<th><?php echo trans('messages.Action'); ?></th>
+					</tr>
+					<tr>
+						<td><?php echo trans('messages.Auto Allocation of Delivery boy'); ?> </td>
+						<td class="onoff">
+							<input type="checkbox" name="auto_allocation" class="onoff_chck" id="onoff" value="1" <?php echo ($config_data['auto_allocation'] == 1) ? 'checked' : ''; ?>>
+							<label class="onoff_lbl" for="onoff"></label>							
+						</td>
+					</tr>					
+					<tr>
+						<td><?php echo trans('messages.Order Accept Time Limit in Minutes'); ?></td>
+						<td> 
+							<input type="text" name="order_accept_timelimit" class="form-control" value="<?php echo (Input::old('order_accept_timelimit') != '') ? Input::old('order_accept_timelimit') : $config_data['order_accept_timelimit'] / 60; ?>"> 
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('order_accept_timelimit') != '') ? $error->first('order_accept_timelimit') : ''; ?></p><?php endif; ?>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo trans('messages.Delivery boy Radius in KM'); ?></td>
+						<td> 
+							<input type="text" name="deliveryboy_radius" class="form-control" value="<?php echo (Input::old('deliveryboy_radius') != '') ? Input::old('deliveryboy_radius') : $config_data['deliveryboy_radius']; ?>">
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('deliveryboy_radius') != '') ? $error->first('deliveryboy_radius') : ''; ?></p><?php endif; ?> 
+						</td>
+					</tr>					
+					<tr>
+						<td colspan="2" class="sub_head"><?php echo trans('messages.Tax Amount'); ?> </td>
+					</tr>					
+					<!--<tr>
+						<td>< ?php echo trans('messages.Service tax in'); ?> % </td>
+						<td> 
+							<input type="text" name="service_tax" class="form-control" value="< ?php echo (Input::old('service_tax') != '') ? Input::old('service_tax') : $config_data['service_tax']; ?>"> 
+							<?php if(Session::has('error')): ?><p class="error_msg">< ?php echo ($error->first('service_tax') != '') ? $error->first('service_tax') : ''; ?></p><?php endif; ?> 
+						</td>
+					</tr>-->
+					<tr>
+						<td><?php echo trans('messages.Vat tax in'); ?> %</td>
+						<td> 
+							<input type="text" name="vat" class="form-control" value="<?php echo (Input::old('vat') != '') ? Input::old('vat') : $config_data['vat']; ?>"> 
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('vat') != '') ? $error->first('vat') : ''; ?></p><?php endif; ?> 
+						</td>
+					</tr>
+					
+					<tr>
+						<td colspan="2" class="sub_head"><?php echo trans('messages.Time Setting'); ?> </td>
+					</tr>
+					<tr>
+						<td><?php echo trans('messages.Delivery time in minutes'); ?></td>
+						<td> 
+							<input type="text" name="delivery_time" class="form-control" value="<?php echo (Input::old('delivery_time') != '') ? Input::old('delivery_time') : $config_data['delivery_time']; ?>"> 
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('delivery_time') != '') ? $error->first('delivery_time') : ''; ?></p><?php endif; ?> 
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo trans('messages.Pickup time in minutes'); ?></td>
+						<td> 
+							<input type="text" name="pickup_time" class="form-control" value="<?php echo (Input::old('pickup_time') != '') ? Input::old('pickup_time') : $config_data['pickup_time']; ?>"> 
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('pickup_time') != '') ? $error->first('pickup_time') : ''; ?></p><?php endif; ?> 
+						</td>
+					</tr>					
+			
+				</table>	
+
+                    </div><!--box-body-->  
+
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o"></i><?php echo trans('messages.Update Settings'); ?></button>
+                        <button type="reset" class="btn pull-right"><i class="fa fa-refresh"></i><?php echo trans('messages.Cancel'); ?></button>
+                    </div><!-- box-footer -->					
+                    <?php echo Form::close(); ?>
+
+                </div><!--box-->
+
+                
+
+            </div>	  
+        </div>  
+    </section><!-- /.content -->
+</div><!-- /.content-wrapper -->
+<script>
+
+    function setchangeimg(val)
+    {
+        $('#txt_changeprofileimage').html(val);
+    }
+    $(document).on("change", "#upload_logo", function () {
+        console.log("The text has been changed.");
+        var file = this.files[0];
+        var imagefile = file.type;
+        var match = ["image/jpeg", "image/png", "image/jpg"];
+        if (!((imagefile == match[0]) || (imagefile == match[1]) || (imagefile == match[2])))
+        {
+            document.getElementById('error').innerHTML = 'The image must be a file of type: jpg, jpeg, png';
+            return false;
+        } else
+        {
+            document.getElementById('error').innerHTML = '';
+            var reader = new FileReader();
+            reader.onload = logoIsLoaded;
+            reader.readAsDataURL(this.files[0]);
+        }
+        $("#txt_changeprofileimage").html(file.name);
+    });
+
+    $(document).on("change", "#upload_favicon", function () {
+        console.log("The text has been changed.");
+        var file = this.files[0];
+        var imagefile = file.type;
+        var match = ["image/jpeg", "image/png", "image/jpg"];
+        if (!((imagefile == match[0]) || (imagefile == match[1]) || (imagefile == match[2])))
+        {
+            document.getElementById('error').innerHTML = 'The image must be a file of type: jpg, jpeg, png';
+            return false;
+        } else
+        {
+            document.getElementById('error').innerHTML = '';
+            var reader = new FileReader();
+            reader.onload = faviconIsLoaded;
+            reader.readAsDataURL(this.files[0]);
+        }
+        $("#txt_changeprofileimage").html(file.name);
+    });
+
+    $(document).on("change", "#upload_img", function () {
+        console.log("The text has been changed.");
+        var file = this.files[0];
+        var imagefile = file.type;
+        var match = ["image/jpeg", "image/png", "image/jpg"];
+        if (!((imagefile == match[0]) || (imagefile == match[1]) || (imagefile == match[2])))
+        {
+            document.getElementById('error').innerHTML = 'The image must be a file of type: jpg, jpeg, png';
+            return false;
+        } else
+        {
+            document.getElementById('error').innerHTML = '';
+            var reader = new FileReader();
+            reader.onload = imageIsLoaded;
+            reader.readAsDataURL(this.files[0]);
+        }
+        $("#txt_changeprofileimage").html(file.name);
+    });
+
+    function imageIsLoaded(e)
+    {
+        var image = new Image();
+        image.src = e.target.result;
+        image.onload = function () {
+            $(".roundedimg").attr('src', e.target.result);
+        }
+    }
+
+    function faviconIsLoaded(e)
+    {
+        var image = new Image();
+        image.src = e.target.result;
+        image.onload = function () {
+            $(".faviconimg").attr('src', e.target.result);
+        }
+    }
+
+    function logoIsLoaded(e)
+    {
+        var image = new Image();
+        image.src = e.target.result;
+        image.onload = function () {
+            $(".logoimg").attr('src', e.target.result);
+        }
+    }
+</script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('adminheader', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

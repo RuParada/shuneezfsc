@@ -1,0 +1,181 @@
+<?php $__env->startSection('content'); ?>
+
+<div class="content-wrapper">
+<section class="content-header">
+<p id="update_msg"></p>
+<?php if(Session::has('success')): ?><p class="success_msg" id="success_msg"><?php echo Session('success'); ?></p><?php endif; ?>
+<div class="content height">
+    <div class="drag_main">
+        <div class="drag_section">
+            <!--<div class="search_list full_row">
+                <input type="text" class="input_control" placeholder="Search...">
+                <i class="fa fa-search"></i>
+            </div> search_list-->
+			<h3>Foodics</h3>
+            <?php if(count($products)): ?>
+            <ul class="drag_list" id="drag-left">
+                <?php $__currentLoopData = $products->products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?> 
+                    <li>
+                        <h4><?php echo $product->name->en; ?></h4>
+                        <input type="hidden" class="foodics_value" value="<?php echo $product->hid; ?>">
+                        <span class="item_tag"><?php echo $product->hid; ?></span>
+						<a class="view" onclick="viewdetails('<?php echo $product->hid; ?>', 'f');"><i class="fa fa-eye"></i></a>
+                    </li>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </ul> <!--drag_list-->
+            <?php endif; ?>
+        </div> <!--drag_section-->
+        
+        <div class="drag_text">Drag to Match</div>
+        
+        <div class="drag_section">
+            <!--<div class="search_list full_row">
+                <input type="text" class="input_control" placeholder="Search...">
+                <i class="fa fa-search"></i>
+            </div> search_list-->
+			<h3>Shuneez</h3>
+            <?php if(count($items)): ?>
+            <ul class="drag_list no_drag" id="drag-right">
+                <?php $__currentLoopData = $items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <li>
+                    <h4><?php echo $item->item; ?></h4>
+                    <input type="hidden" class="item_value" value="<?php echo $item->id; ?>">
+                    <?php if($item->foodics_id != ''): ?>
+                        <span class="item_tag"><?php echo $item->foodics_id; ?><a class="remove" onclick="removeFoodics(<?php echo $item->id; ?>);"><i class="fa fa-times-circle"></i></a></span>
+                    <?php endif; ?>
+					<a class="view"  onclick="viewdetails(<?php echo $item->id; ?>, 's');"><i class="fa fa-eye"></i></a>
+                </li>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </ul> <!--drag_list-->
+            <?php endif; ?>
+        </div> <!--drag_section-->
+        
+    </div> <!--drag_main-->
+</div> <!--full_row-->
+<div class="modal_load">
+</div>
+<input type="hidden" id="foodics_id" value="">
+<!--JS-->
+<script>
+$(document).ready(function(){
+    $('#drag-left li').draggable({
+        connectToSortable: "#sortable",
+        appendTo: "body",
+        helper: function (event) {
+            var src = $(event.currentTarget);
+            var foodics_id = $(this).find('.foodics_value').val();
+            html = $('<div />').addClass('addon-draggable');
+            html.text(foodics_id);
+            $("#foodics_id").val(foodics_id);
+            return html;
+        },
+
+        cursorAt: { left: 20 },     
+        delay: 300,
+        revert: "invalid"
+    });
+
+
+    $("#drag-right li").droppable({
+        greedy: true,
+        drop: function( event, ui ) {
+            var draggable = $(ui.draggable[0]);         
+            console.log(event.currentTarget);
+            draggable = $(this);
+            var foodics_id = $("#foodics_id").val();
+            $(this).find('.item_tag').remove();
+            var item_id = ($(this).find('.item_value').val());
+            updateItem(item_id, foodics_id, draggable)
+        }
+    });
+});
+
+function updateItem(item_id, foodics_id, draggable)
+{
+    $("#success_msg").hide();
+    $.ajax({
+    beforeSend : function() {
+        $("body").addClass("loading");
+    },
+    type : "GET",
+    dataType : "json",
+    url  : "<?php echo URL::to('admin/updatefoodics_item'); ?>",
+    data : {'item_id' : item_id, 'foodics_id' : foodics_id},
+    async: true,
+    success: function(result) {
+                $("body").removeClass("loading");
+                if(result.success)
+                {
+                    $("#update_msg").removeClass('error_msg').addClass('success_msg').text(result.msg);
+                    draggable.append("<span class='item_tag'><a class='remove' onclick='removeFoodics("+item_id+");'><i class='fa fa-times-circle'></i></a>"+foodics_id+"</span>");
+                }
+                else
+                {
+                    $("#update_msg").removeClass('success_msg').addClass('error_msg').text(result.msg);
+                }
+            }
+        });
+}
+
+function removeFoodics(id)
+{
+    var url = '<?php echo URL::to('/'); ?>';
+    if(confirm('<?php echo trans('messages.Are you sure you want to remove foodics?'); ?>'))
+    {
+        window.location.href = url+'/admin/removefoodicsitem/'+id;
+    }
+}
+
+function viewdetails(id, type)
+{
+    $.ajax({
+      beforeSend: function () {
+        $("body").addClass("loading");
+      }
+      ,
+      type: "GET",
+      url: "<?php echo URL::to('admin/viewitem'); ?>",
+      data: {'id': id, 'type': type},
+      async: true,
+      success: function (result) {
+        $("body").removeClass("loading");
+        $('#modal_view').html(result).modal('show');
+      }
+    });
+}
+</script>
+    
+</section>
+</div><!-- /.content-wrapper -->
+
+
+<!-- modal_view -->
+<div id="modal_view" class="modal fade view" role="dialog" data-backdrop="static">
+	
+</div><!--modal_view-->
+
+<style>
+  .modal_load {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+      url(<?php echo URL::to('assets/images/loading.gif');
+    ?>) 
+    50% 50% 
+    no-repeat;
+  }
+  body.loading {
+    overflow: hidden;
+  }
+  body.loading .modal_load {
+    display: block;
+  }
+</style>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('adminheader', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

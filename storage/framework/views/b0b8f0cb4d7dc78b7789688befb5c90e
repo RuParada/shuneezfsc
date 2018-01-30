@@ -1,0 +1,82 @@
+
+<?php $__env->startSection('content'); ?>
+<?php $seg = Request::segment(3); ?>
+ 
+<style type="text/css">
+.activity > a 
+{
+  color: #838383 !important;
+}
+</style>
+<div class="content-wrapper">
+	<section class="content-header header_filter">
+		<h1><?php echo trans('messages.Dashboard'); ?> <small><?php echo trans('messages.Control Panel'); ?></small> </h1>	
+    <div class="form-group full_selectList">
+			<div class="input-group">
+			<div class="input-group-addon"> <i class="fa fa-building"></i> </div>
+				<select class="selectList" name="branch_id" id="branch_id" onchange="filter_orders();">
+					<option value=""><?php echo trans('messages.Select Branch'); ?></option>
+					<?php if(count($branches))
+					{
+						foreach($branches as $branch)
+						{
+							$select = ($seg == $branch->id) ? 'selected' : ''; 
+					?>
+					<option value="<?php echo $branch->id; ?>" <?php echo $select; ?>><?php echo $branch->branch; ?></option>
+					<?php } } ?>
+				</select>
+			</div>
+	
+	</section>
+	
+	<div class="full_row"></div>
+
+	<!-- Main content -->
+	<section class="content">
+
+	<div class="row">
+	
+		<div class="col-md-4">
+			<div class="info-box">
+				<span class="info-box-icon bg_green"><i class="fa fa-usd"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text"><?php echo trans('messages.Total Sales'); ?></span>
+					<span class="info-box-number"><small>$ </small><?php echo $sale['overall']; ?></span>
+				</div><!-- info-box-content -->
+			</div><!-- info-box -->
+		</div>
+	
+		<div class="col-md-4">
+			<div class="info-box">
+				<span class="info-box-icon bg_yellow"><i class="fa fa-usd"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text"><?php echo trans('messages.Sales of This Month'); ?></span>
+					<span class="info-box-number"><small>$</small> <?php echo $sale['month']; ?></span>
+				</div><!-- info-box-content -->
+			</div><!-- info-box -->
+		</div>	
+		
+		
+		<div class="col-md-4">
+			<div class="info-box">
+				<span class="info-box-icon bg_blue"><i class="fa fa-usd"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text"><?php echo trans('messages.Today Sales'); ?></span>
+					<span class="info-box-number"><small>$ </small><?php echo $sale['today']; ?></span>
+				</div><!-- info-box-content -->
+			</div><!-- info-box -->
+		</div>		
+	
+    </div> <!-- row --> 
+ </div>
+ <script>
+ function filter_orders()
+ {
+	 var branch_id = $("#branch_id").val();
+	 var url = '<?php echo URL::to(''); ?>'
+	 window.location.href= url+'/admin/filter_dashboard/'+branch_id;
+ }
+ </script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('adminheader', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

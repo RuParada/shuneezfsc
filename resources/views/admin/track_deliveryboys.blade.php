@@ -1,0 +1,130 @@
+@extends('adminheader')
+
+@section('content')
+{!! Html::script('assets/js/socket.io.js') !!}
+
+@if(Session::has('error')) <?php $error = Session::get('error'); ?> @endif
+<?php $order_id = 0; 
+$dookId = [];
+if ( count($deliveryboys) ) {
+    foreach ($deliveryboys as $deliveryboy) {
+        $dookId[] = $deliveryboy->dook_id;
+    }
+} 
+$driverDookId = implode(',', $dookId);
+?>
+<div class="content-wrapper">
+
+    <section class="content-header">
+        <h1><?php echo trans('messages.Track Deliveryboys'); ?> </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="box">
+				<div id="map-canvas" style="height:500px"></div>
+				
+                </div><!--box-info-->
+              <div class="col-md-3" id="deliveryboy_details" style="border:1px solid #fff; padding:10px; background-color:#fff;">
+				
+				</div>
+            </div></div>	  
+
+    </section><!-- /.content -->
+</div><!-- /.content-wrapper -->
+<script>
+    var map, infoWindow, googleMapBounds,
+        driverMarkers = {};
+        image = '{!! URL::to('assets/images/CarLocation.png') !!}',
+        socket = io.connect('192.168.1.113:8091');
+
+    function initialize() 
+    {
+       var mapOptions = {
+          center: new google.maps.LatLng(24.7136,46.6753),
+          zoom: 8,
+          mapTypeId: 'roadmap',
+       };
+      
+
+       map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+       // a new Info Window is created
+       infoWindow = new google.maps.InfoWindow();
+
+       // Event that closes the Info Window with a click on the map
+       google.maps.event.addListener(map, 'click', function() {
+          infoWindow.close();
+       });
+       // Finally displayMarkers() function is called to begin the markers creation
+       //displayMarkers();
+    }
+
+
+    $('document').ready(function(){
+        var dookId = "{!! $driverDookId !!}";     
+        google.maps.event.addDomListener(window, 'load', initialize);   
+        googleMapBounds = new google.maps.LatLngBounds();
+        socket.emit('driver_location',{driver_id : dookId});
+        socket.on('driver_location',function(data)  {
+            console.log(data);
+            if(data.indexOf(":ok") == -1)
+            {
+                let position = (data.indexOf("\n", ","));
+                if(position)
+                {
+                    let test = data.substr(position+1).replace("data: ", "").replace("\n", "").replace("\n", "");
+                    let driverLocation = JSON.parse(test); 
+                    if(driverLocation.data)
+                    {
+                        if(driverMarkers[driverLocation.data.driverId])
+                        {
+                            driverMarkers[driverLocation.data.driverId].setMap(null);
+                        }
+                        //else
+                        {
+                            let latlng = new google.maps.LatLng(driverLocation.data.gpsLocation);
+                            driverMarkers[driverLocation.data.driverId]  = new google.maps.Marker({
+                                center: new google.maps.LatLng(latlng),
+                                map: map,
+                                position: latlng,
+                                title: driverLocation.data.driverId,
+                                icon: image
+                            });
+
+                            googleMapBounds.extend(latlng); 
+                            //map.fitBounds(googleMapBounds);
+                            //map.setZoom(12);
+
+                        }
+                    }
+                }
+            }
+        });
+
+    });
+</script>
+<style>
+html {
+	height: 100%;
+}
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+#map-canvas {
+	height: 100%;
+}
+#iw_container .iw_title {
+	font-size: 16px;
+	font-weight: bold;
+}
+.iw_content {
+	padding: 15px 15px 15px 0;
+}
+</style>
+@endsection

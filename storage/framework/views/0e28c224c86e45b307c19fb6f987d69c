@@ -1,0 +1,214 @@
+<?php
+$encrypter = app('Illuminate\Encryption\Encrypter');
+$encrypted_token = $encrypter->encrypt(csrf_token());
+?>
+<div class="modal-header">
+   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+ </div>
+<?php echo Form::open(array('url' => 'additem', 'id' => 'ingredient_form')); ?> 
+<div class="modal-bdy1">
+      <div class="col-md-12 ing_popup_agn1" style="padding: 0">
+
+        <div class="col-md-8 ing_popup_agn">
+          <h3><?php echo $vendor_item->item; ?></h3>
+          <p><?php echo $vendor_item->description; ?></p>
+          <span><p style="font-size:24px;"><?php echo trans('frontend.Quantity'); ?></><button type="button" onclick="updateqty_new('add');" class="plusbtn pls_agn">+</button>
+              <input type="textbox" id="qty" name="quantity" value="1" style="text-align:center;width:50px;height:27px;border-radius:1px;border:1px solid #999;position: relative;
+    top: 3px;">
+			  <input type="hidden" name="item_id" value="<?php echo $vendor_item->id; ?>">
+              <button type="button" class="minusbtn" onclick="updateqty_new('remove');" style="font-size:16px;">-</button></span><br>
+              <div class="pce">
+                <span class="price-tg" style="margin-top:20px;"><sup class="ptg"><?php echo $default_currency; ?></sup> <?php echo $vendor_item->price; ?></span>
+              </div>
+       </div>
+        <div class="col-md-4">
+          <div class="n"><img src="<?php echo URL::to('assets/uploads/vendor_items/'.$vendor_item->image); ?>" style="width:100%;position: absolute;float: left;height: 100%;"></div>
+        
+      </div>
+      <div class="clr"></div>
+      </div>
+       <ul class="ingredientlists">
+         <?php foreach ($size_list as $size) { ?>
+         <li>
+          <input type="radio" name="size" value="<?php echo $size->size.'|'.$size->id.'|'.$size->price; ?>" d="size<?php echo $size->id; ?>"/>
+          <label for="size<?php echo $size->id; ?>"><?php echo $size->size; ?> (<span class="price-tg1"><sup class="ptg"><?php echo $default_currency; ?></sup> <?php echo $size->price; ?></span>)</label>
+          
+         </li>
+         <?php } ?>
+         <span id="size_error" class="error_msg"></span>
+        </ul>
+      <?php
+      if(count($items))
+      {
+		  foreach($items as $item) {
+	  ?>
+	  
+      <div class="modal_bdy2 ingredients" data-required=<?php echo $item['ingredients']->required; ?> data-minimum =<?php echo $item['ingredients']->minimum; ?> data-maximum= <?php echo $item['ingredients']->maximum; ?>>
+		 <div class="col-xs-12">
+         <div class="row">
+            <p style="color:#000;font-weight:600;font-size:18px;"><?php echo $item['ingredients']->ingredient_name; ?></p>
+          </div>
+
+		   <div class="row">
+			  <ul class="ingredientlists">
+        <?php if(count($item['ingredientlists']))
+			  {
+				  foreach($item['ingredientlists'] as $ingredientlist) { 
+			  ?> 
+				<li>
+					<input type="checkbox" name="ingredient_list[]" value="<?php echo $ingredientlist->ingredientlist_name.'|'.$ingredientlist->ingredientlist_id.'|'.$ingredientlist->price; ?>" class="css-checkbox" id="ingredientlist<?php echo $ingredientlist->id; ?>"/>
+					<label for="ingredientlist<?php echo $ingredientlist->id; ?>" class="css-label-ingredients-popup "><?php echo $ingredientlist->ingredientlist_name; ?> (<span class="price-tg1"><sup class="ptg"><?php echo $default_currency; ?></sup> <?php echo $ingredientlist->price; ?></span>)</label>
+					
+				</li>
+			  <?php } } ?>
+			  </ul>
+		  </div>
+          </div>
+          <span class="error_msg"></span>
+      </div>
+      <hr>
+      <?php } } ?>
+      <?php
+        if(count($execlusions))
+        {
+      ?>
+    
+      <div class="modal_bdy2 ingredients">
+     <div class="col-md-12">
+     <div class="row">
+
+          <div class="col-md-2">
+            <p style="color:#000;font-weight:600;font-size:18px;">Execlusions</p>
+          </div>
+          </div>
+           <div class="col-md-10">
+       <div class="row">
+        <ul class="ingredientlists">
+        <?php foreach($execlusions as $execlusion) { ?>
+        <li>
+          <input type="checkbox" name="execlusion_id[]" value="<?php echo $execlusion->execlusion.'|'.$execlusion->id; ?>" class="css-checkbox" id="execlusion<?php echo $execlusion->id; ?>"/>
+          <label for="execlusion<?php echo $execlusion->id; ?>" class="css-label-ingredients-popup "><?php echo $execlusion->execlusion; ?></label>
+        </li>
+        <?php } ?>
+        </ul>
+      </div>
+            </div>
+          </div>
+          <span class="error_msg"></span>
+      </div>
+      <hr>
+      <?php } ?>
+      </div>
+      <hr style="background:#3e3e3e;">
+      <div class="modal_bdy2">
+        
+        <div class="form-group">
+      <label for="comment" style="color:#000;font-weight:600;font-size:18px;"><?php echo trans('frontend.Message'); ?></label>
+      <textarea name="message" class="form-control" rows="5" id="comment"></textarea>
+    </div>
+    <div align='center' id='error_msg' style='color:red'></div>
+      </div>
+
+      <div class="clr"></div>
+      
+      <div class="modal-foot1">
+		<button type="submit" class="addtocart" ><?php echo trans('frontend.Add to Cart'); ?></button>
+        <button type="button" class="cancel_btn" data-dismiss="modal"><?php echo trans('frontend.Cancel'); ?></button>
+      </div>
+<?php echo Form::close(); ?>
+
+<style>
+
+div#SelectIngredient {
+width: 70%;
+background: white;
+max-height: 500px;
+margin: 7% auto;
+}
+</style>
+
+<script>
+function updateqty_new(action)
+{
+	var qty = $("#qty").val();
+	if(action == 'add')
+	{
+		var newqty = parseInt(qty) + 1;
+		$("#qty").val(newqty);
+	}
+	else
+	{
+		var newqty = parseInt(qty) - 1;
+		newqty = (newqty < 1) ? 1 : newqty; 
+		$("#qty").val(newqty);
+	}
+	
+}
+
+$(function(){
+
+$('#ingredient_form').on('submit',function(e)
+{
+    $('span.has_error').text('');
+    $('span').removeClass('has_error');
+		//alert($('input[name="ingredient_list[]"]:').val());return false;
+    //if ($('input[name="ingredient_list[]"]').val())
+	    $.ajaxSetup({
+	        header:$('meta[name="_token"]').attr('content')
+	    })
+       	e.preventDefault(e);
+        $(".ingredients").each(function()
+        {
+          var totalitem   = $(this).find('input[name="ingredient_list[]"]:checked').length;
+          var minimum     = $(this).attr('data-minimum');
+          var maximum     = $(this).attr('data-maximum');
+          if($(this).attr('data-required') == "1")
+          { 
+            if(totalitem == 0)
+            {
+              $(this).find('span.error_msg').addClass("has_error");
+              $(this).find('span.error_msg').text("Select atleast " + minimum + " ingredient");
+            }
+          }
+          if(totalitem > 0)
+          {
+            if(totalitem > maximum && maximum != '0')
+            {
+              $(this).find('span.error_msg').addClass("has_error");
+              $(this).find('span.error_msg').text("Cannot be select more than " + maximum);
+            }
+            if(totalitem < minimum && minimum != '0')
+            {
+              $(this).find('span.error_msg').addClass("has_error");
+              $(this).find('span.error_msg').text("Please select atleast " + minimum);
+            }
+          }
+        })
+        if($(".has_error").length) {       
+          return false;
+        }
+        else
+        {
+  	 		  $(".has_error").html('');
+  		
+          $.ajax({
+          type:"GET",
+          url:'additem',
+          data:$(this).serialize(),
+          dataType: 'json',
+          success: function(data){
+    			$("#cart_details").load(location.href + " #cartbox");
+    			$("#checkout_btn").load(location.href + " #checkout_btn");
+                $('#SelectIngredient').modal('hide');
+               return false;
+          },
+          error: function(data){
+
+          }
+          })
+        }
+    });
+	 
+});
+
+</script>

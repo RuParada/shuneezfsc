@@ -1,0 +1,129 @@
+<?php $current_language = (isset($_SESSION['language'])) ? $_SESSION['language'] : 'en'; ?>
+<?php echo Form::open(array('url' => 'admin/additem', 'id' => 'ingredient_form')); ?>
+
+<div class="modal-header">
+   <button type="button" class="close2" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+   <h2 class="modal-title" id="myModalLabel">Choose product choices... </h2>
+ </div>
+ <div class="modal-bdy1">
+ <div class="col-md-12">
+   <div class="col-md-3"><img src="<?php echo URL::to('assets/uploads/vendor_items/'.$vendor_item->image); ?>"></div>
+   <div class="col-md-9">
+	 <h4><?php echo $vendor_item->item; ?> : $<?php echo $vendor_item->price; ?></h4>
+		<input type="hidden" name="item_id" value="<?php echo $vendor_item->id; ?>">
+		 <span>Quantity<button type="button" onclick="updateqty('add');" class="plusbtn" style="margin-left:20px;">+</button>
+		 <input type="text" id="qty" name="quantity" style="width:40px;height:27px;border-radius:1px;border:1px solid #999;" value = "1">
+		 <button type="button"  onclick="updateqty('remove');" class="minusbtn">-</button></span>
+  </div>
+ </div>
+ <div class="clr"></div>
+ </div>
+ <div class="modal_bdy2">
+	 <?php if(count($ingredients) > 0)
+	 {
+		 foreach($ingredients as $ingredient) { //echo '<pre>'; print_r($item); exit; }}
+		 //echo '<pre>'; print_r($ingredient); exit;
+	?>
+   <div class="col-md-12">
+   		<input type='hidden' id='min_val' value='<?php echo $ingredient->minimum; ?>'>
+   		<input type='hidden' id='max_val' value='<?php echo $ingredient->maximum; ?>'>
+   		<input type='hidden' id='is_required' value='<?php echo $ingredient->required; ?>'>
+
+	 <h3><?php $ingredient->ingredient_name; ?><span style="float:right;font-size:14px;">Minimum <?php echo $ingredient->minimum; ?> and Maximum <?php echo $ingredient->maximum; ?></span></h3>
+	<?php
+	$ingredientlists = DB::table('vendor_item_ingredientlist')
+									->join('ingredientlist_description', 'vendor_item_ingredientlist.item_ingredientlist_id', '=', 'ingredientlist_description.ingredientlist_id')
+									->SelectRaw(DB::getTablePrefix().'vendor_item_ingredientlist.*,'.DB::getTablePrefix().'ingredientlist_description.ingredientlist_name,'.DB::getTablePrefix().'ingredientlist_description.ingredientlist_id')
+									->where('vendor_item_ingredientlist.item_ingredient_id', $ingredient->id)
+									->where('ingredientlist_description.language', $current_language)
+									->get();
+	?>
+	 <ul style="list-style:none;padding-left:0px;margin-top:30px;">
+	   <?php foreach($ingredientlists as $ingredientlist) { ?>
+	   <li>
+		 <p><input type="checkbox" class="regular-checkbox" name="ingredient_list[]" value="<?php echo $ingredientlist->ingredientlist_name.'|'.$ingredientlist->ingredientlist_id.'|'.$ingredientlist->price; ?>">&nbsp;<span><?php echo $ingredientlist->ingredientlist_name; ?></span> <span class="price-tg">$<?php echo $ingredientlist->price; ?></span> </p>
+	   </li>
+	   <?php } ?>
+	 </ul>
+			 
+   </div>
+   <?php  } } ?>
+ </div>
+ <div class="clr"></div>
+<div class="modal-footer forgot_btn">
+	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	<button type="submit" class="btn btn-primary">Submit</button>	
+</div>
+<div align='center' id='error_msg' style='color:red'>
+</div>
+<?php echo Form::close(); ?>
+
+
+<style>
+
+div#SelectIngredient {
+width: 50%;
+background: white;
+max-height: 500px;
+margin: 7% auto;
+}
+</style>
+
+<script>
+function updateqty(action)
+{
+	var qty = $("#qty").val();
+	if(action == 'add')
+	{
+		var newqty = parseInt(qty) + 1;
+		$("#qty").val(newqty);
+	}
+	else
+	{
+		var newqty = parseInt(qty) - 1;
+		newqty = (newqty < 1) ? 1 : newqty; 
+		$("#qty").val(newqty);
+	}
+	
+}
+
+$(function(){
+	$('#ingredient_form').on('submit',function(e)
+	{
+		var totalitem 	= $(this).find('input[name="ingredient_list[]"]:checked').length;
+		var min_value 		= $("#min_val").val();
+		var max_value 		= $("#max_val").val();
+		var is_required = $("#is_required").val();
+	    $.ajaxSetup({
+	        header:$('meta[name="_token"]').attr('content')
+	    })
+       	e.preventDefault(e);
+       	if(totalitem < min_value && is_required==1)
+       	{
+       		$("#error_msg").html('Minimum '+min_value+' Required');
+       	}
+       	else if(totalitem > max_value)
+       	{
+       		$("#error_msg").html('Maximum '+max_value+' Allowed');
+       	}
+        else{
+	 		$("#error_msg").html('');
+	        $.ajax({
+		        type:"GET",
+		        url:'/admin/additem',
+		        data:$(this).serialize(),
+		        dataType: 'json',
+		        success: function(data){
+					//$("#cartbox").html(data.items);
+					$('#SelectIngredient').modal('hide');
+					$("#cartdetails").load(location.href + " #cartbox");
+		        },
+		        error: function(data){
+		        }
+	    	})
+	    }
+	});	 
+});
+
+
+</script>

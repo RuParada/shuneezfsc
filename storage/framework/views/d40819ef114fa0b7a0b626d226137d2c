@@ -1,0 +1,69 @@
+<?php $__env->startSection('content'); ?>
+<style>
+    .control-label {
+        text-align:left !important;
+    }
+</style>
+<?php if(Session::has('error')): ?> <?php $error = Session::get('error'); ?> <?php endif; ?>
+
+<div class="content-wrapper">
+
+    <section class="content-header">
+        <h1><?php echo trans('messages.Send Newsletter'); ?></h1>
+        <?php if(Session::has('success')): ?><p class="success_msg" id="s_msg"><?php echo Session::get('success'); ?></p><?php endif; ?>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <?php echo Form::open(array('url' => 'admin/sendnewsletter', 'class' => 'form-horizontal')); ?>
+
+            <div class="col-md-8">
+
+                <div class="box">
+
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><?php echo trans('messages.Fill the below fields'); ?></h3>
+                    </div><!--box-header-->		
+
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="subject" class="col-sm-3 control-label"><?php echo trans('messages.Subject'); ?><span class="req">*</span></label>
+                            <div class="col-sm-9">
+                                <input type="text" name="subject" class="form-control" placeholder="<?php echo trans('messages.Subject'); ?>" value="<?php echo Input::old('subject'); ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('subject') != '') ? $error->first('subject') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="form-group product_desc">
+                            <label for="description" class="col-sm-12 control-label"><?php echo trans('messages.Description'); ?> <span class="req">*</span></label>
+                            <div class="col-sm-12">
+                                <textarea class="textarea" name="description" placeholder="<?php echo trans('messages.Description'); ?>"><?php echo Input::old('description'); ?></textarea>
+                            </div>
+                            <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('description') != '') ? $error->first('description') : ''; ?></p><?php endif; ?>
+                        </div>
+                        
+                        
+                    </div><!--box-body--> 
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o"></i><?php echo trans('messages.Send Newsletter'); ?></button>
+                        <button type="reset" class="btn pull-right"><i class="fa fa-refresh"></i><?php echo trans('messages.Clear'); ?></button>
+                        
+                    </div><!-- box-footer -->      
+
+                </div><!--box-info-->
+            </div>	  
+
+            <?php echo Form::close(); ?>	          
+    </section><!-- /.content -->
+</div><!-- /.content-wrapper -->
+
+<script>
+    $(function () {
+        $(".textarea").wysihtml5();
+    });
+</script>
+
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('adminheader', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

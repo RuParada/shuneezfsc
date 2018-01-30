@@ -1,0 +1,109 @@
+
+
+<?php $__env->startSection('content'); ?>
+      <?php
+      // echo "<pre>";
+      // print_r($items);
+      // exit;
+      ?>
+
+    <div class="container">
+        <div class="verfiy-page">
+              <div class="bred1">
+                <a href="<?php echo URL::to('/'); ?>" class="bred2">Home</a><img src="assets/img/breadcrumb-arrow.png" class="bred"><a href="#">My Order</a>
+              </div>
+        </div>
+        <div class="col-md-3 pad0">
+            <div class="inn_mnu">
+              <ul class="in_mnu">     
+              <li class="active"><a href="<?php echo URL::to('/myorder'); ?>">My Order</a></li>           
+                <li><a href="<?php echo URL::to('/edit_profile'); ?>">Edit Profile</a></li>
+                <li><a href="<?php echo URL::to('/address_book'); ?>">Address Book</a></li>
+                
+               <!--  <li><a href="#">Logout</a></li> -->
+              </ul>
+            </div>
+        </div>
+        <div class="col-md-9 ">
+            <div class="col-md-12">
+                <p style="font-size:24px;color:#3e3e3e;">MyOrder</p>
+                <hr>
+            </div>
+            <div class="lis_sect col-md-12">
+
+            <?php
+                foreach($orders as $order)
+                {
+            ?>
+                <div class="col-md-6">
+                    <p style="font-size:18px;color:#3e3e3e;"><?php echo $order['order']->branch_name; ?></p>
+                    <p style="font-size:15px;color:#3e3e3e;font-style: italic;margin-top:-10px;"><?php echo date('d-M-Y g:i A', strtotime($order['order']->order_date)); ?></p>
+                    <p style="font-size:15px;color:#3e3e3e;"><?php echo $order['items']; ?></p>
+                    <p style="font-size:15px;color:#3e3e3e;font-weight: bold;">$<?php echo $order['order']->order_total; ?></p>
+                    <button type="button" class="view_ord" data-toggle="modal" onclick="getaddress(<?php echo $order['order']->id; ?>);" data-target="#vieworder-modal">View order</button>
+                    <!--<button type="button" class="view_ord">Reorder</button>-->
+                </div>
+            
+                <div class="col-md-3">
+                    <p style="color:#3e3e3e;font-size:15px;">Deliver Status: <span style="color:#662d91;font-size:16px;">Pending</span></p>
+                </div>
+                <div class="clr"></div>
+                <hr>
+            <?php
+                }
+            ?>
+            </div>
+        </div>
+        <div class="clr"></div>
+    </div>
+    
+      <!-- Button trigger modal -->
+
+      <!--View Order Modal Dialog-->
+<div class="modal fade" id="vieworder-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="viewmodal-container">
+        </div>
+    </div>
+</div>
+<!--End of View Order Modal Dialog-->
+	<script>
+      $('#myTab a').click(function (e) {
+          e.preventDefault()
+          $(this).tab('show')
+      });
+    </script>
+    <script type="text/javascript">   
+      $('.slidingDiv').hide();
+      $('.show_hide').click(function(e){ // <----you missed the '.' here in your selector.
+          e.stopPropagation();
+          $('.slidingDiv').slideToggle();
+      });
+      $('.slidingDiv').click(function(e){
+          e.stopPropagation();
+      });
+
+      $(document).click(function(){
+           $('.slidingDiv').slideUp();
+      });
+      function getaddress(id)
+      {
+        $.ajax({
+                beforeSend: function () {
+                    $("body").addClass("loading");
+                },
+                type: "GET",
+                url: "<?php echo URL::to('/getorder'); ?>",
+                data: {'id': id},
+                async: true,
+                success: function (result) {
+						$("body").removeClass("loading");
+						$("#vieworder-modal").html(result).modal('show');
+                }
+            }); 
+      }
+    </script>
+    
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('header', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

@@ -1,0 +1,326 @@
+<?php $__env->startSection('content'); ?>
+<?php if(Session::has('error')): ?> <?php $error = Session::get('error'); ?> <?php endif; ?>
+<?php $array_valid = (Session::has('array_valid')) ? Session::get('array_valid') : []; ?>
+
+<div class="content-wrapper">
+
+	<section class="content-header">
+		<h1><?php echo trans('messages.Add Ingredient'); ?> </h1>
+		<?php if(Session::has('error')): ?> <p class="error_msg"> Required(*) fields are missing</p> <?php endif; ?>
+	</section>
+
+	<!-- Main content -->
+	<section class="content product">
+	<div class="row margin0">
+	<?php echo Form::open(array('url' => 'admin/addingredient', 'files' => 1)); ?>
+
+	<div class="box no_top_border">
+		<div class="nav-tabs-custom ">
+			<ul class="nav nav-tabs">
+				<?php
+				if(count($languages) > 0)
+				{
+					$i = 0;
+					foreach($languages as $language) {
+						if(count($array_valid)){
+						$active = showvalidmsg($i, $array_valid);
+				?>
+				<li class="<?php echo $active; ?>"><a href="#<?php echo $language->code; ?>" data-toggle="tab"><?php echo ucfirst($language->language); ?></a></li>
+				<?php } else { ?>
+				<li class="<?php echo ($i == 0) ? 'active' : ''; ?>"><a href="#<?php echo $language->code; ?>" data-toggle="tab"><?php echo ucfirst($language->language); ?></a></li>
+				<?php } $i++; } } ?>
+			</ul>
+			<div class="tab-content">
+			<?php
+			if(count($languages) > 0)
+			{
+				$i = 0;
+				foreach($languages as $language) {
+					if(count($array_valid)){
+						$active = showvalidmsg($i, $array_valid);		
+			?>
+			<div class="<?php echo $active; ?> tab-pane" id="<?php echo $language->code; ?>">
+			<?php } else { ?>
+			<div class="<?php echo ($i == 0) ? 'active' : ''; ?> tab-pane" id="<?php echo $language->code; ?>">
+			<?php } ?>
+				<div class="col-md-12">
+					<div class="box">
+						<div class="box-header with-border">
+							 <h3 class="box-title"><?php echo ucfirst($language->language); ?></h3>
+						</div> <!-- box-header -->
+				
+						<div class="box-body col-md-6">
+							<div class="form-group">
+								<label><?php echo trans('messages.Ingredient'); ?> <span class="req">*</span> :</label>
+								<input type="text" class="form-control" name="ingredient_name[]" placeholder="<?php echo trans('messages.Enter Ingredient name'); ?>" value="<?php echo Input::old('ingredient_name')[$i]; ?>">
+								<input type="hidden" name="language[]" value="<?php echo $language->code; ?>">
+								<?php if(count($array_valid)): ?><p class="error_msg"><?php echo ($array_valid[$i] != '') ? trans('messages.Name field is required') : ''; ?></p><?php endif; ?>
+							</div><!-- form-group -->
+						</div><!-- box-body -->                
+				   </div>
+				</div> <!-- col-md-6 -->	
+				
+				
+			</div>
+			<?php $i++; } } ?>
+		
+			</div> <!-- tab-content -->
+			
+			</div> <!-- nav-tabs-custom -->
+		<div class="col-md-12">
+				<div class="box">
+						<div class="box-header with-border">
+							 <h3 class="box-title"><?php echo trans('messages.Details'); ?></h3>
+						</div> <!-- box-header -->
+                <div class="box-body">
+					<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-3 control-label"><?php echo trans('messages.Status'); ?> <span class="req">*</span> :</label>
+						<div class="col-sm-8">
+							<select class="selectLists" name="status">
+								<option value="1"><?php echo trans('messages.Active'); ?></option>
+								<option value="0" <?php echo (Input::old('status') == '0') ? 'selected' : ''; ?>><?php echo trans('messages.Inactive'); ?></option>
+							</select>
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('status') != '') ? $error->first('status') : ''; ?></p><?php endif; ?>
+						</div>
+					</div><!-- form-group -->
+				
+						
+					</div><!-- box-body -->
+					<div class="box-body">
+					<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-7 control-label"><?php echo trans('messages.Want to add list of Ingredients'); ?> <span class="req">*</span> :</label>
+						<div class="col-sm-5">
+							<input type="radio" class="ingredient_list_option" name="ingredient_list" value="1" <?php echo (Input::old('ingredient_list') == 1) ? 'checked' : ''; ?>> <?php echo trans('messages.Yes'); ?>
+							<input type="radio" class="ingredient_list_option" name="ingredient_list" value="0"  <?php echo (Input::old('ingredient_list') == 0 || Input::old('ingredient_list') == '') ? 'checked' : ''; ?>><?php echo trans('messages.No'); ?>
+						</div>
+					</div><!-- form-group -->
+					</div><!-- box-body -->
+					<div class="ingredientlist_type" style="<?php echo (Input::old('ingredient_list') == 1) ? 'display:block' : 'display:none'; ?>">
+					<div class="box-body ingredientlist">
+					<?php
+					if(count($languages) > 0)
+					{
+						$i = 0;
+						foreach($languages as $language) {
+					?>	
+					<div class="form-group full_selectList col-md-3">
+						<div class="col-sm-12">
+							<input type="text" class="form-control col-md-3" name="ingredientlist[0][name][<?php echo $language->code; ?>]" placeholder="<?php echo trans('messages.Ingredient Name'); ?> <?php echo $language->language; ?>" value=""/>
+						</div>
+					</div><!-- form-group -->
+					<?php  } } ?>
+					<div class="form-group full_selectList col-md-3">
+						<div class="col-sm-12">
+							<input type="text" class="form-control col-md-3 allowOnlyPrice" placeholder="<?php echo trans('messages.Price'); ?>" name="ingredientlist[0][price]" value=""/>
+						</div>
+					</div><!-- form-group -->
+					<a href="javascript:void(0);" class="add-ingredient" title="<?php echo trans('messages.Add field'); ?>">
+						<i class="fa fa-plus-circle fa-fw"></i>
+					</a>
+					</div><!-- box-body -->
+					</div> 
+					              
+              </div>
+			</div> <!-- col-md-12 -->
+	
+	<div class="box-footer">
+		<button type="submit" id="submit_form" class="btn btn-primary pull-right"><i class="fa fa-floppy-o"></i><?php echo trans('messages.Save Ingredient'); ?></button>
+		<button type="reset" class="btn pull-right"><i class="fa fa-refresh"></i><?php echo trans('messages.Clear'); ?></button>
+		<button type="button" onclick="window.location.href='<?php echo URL::to('admin/ingredients'); ?>'" class="btn pull-right"><i class="fa fa-chevron-left"></i><?php echo trans('messages.Cancel'); ?></button>
+    </div>
+	<?php echo Form::close(); ?>	
+	</div> <!-- box -->
+	</div>	
+    </section><!-- content -->
+
+</div><!-- content-wrapper -->
+<?php 
+function selectdrop($val1, $val2)
+{
+	$select = ($val1 == $val2) ? 'selected' : '';
+	return $select; 
+}
+?>
+<script type="text/javascript">
+$(document).ready(function(){
+	$(document).on("click", ".add-ingredient", function(){
+		$clone = $(".ingredientlist:last").clone();
+		$clone.find(".remove_button").remove();
+		if($(this).siblings().hasClass("remove_button"))
+		$(this).remove();
+		$(this).siblings(".remove-list").remove();
+		$(".ingredientlist a").attr("title", "<?php echo trans('messages.remove'); ?>");	
+		$(".ingredientlist a").removeClass("add-ingredient").addClass("remove-ingredient").css("color", "#C20C0C");
+		$(".ingredientlist a i").removeClass("fa-plus-circle").addClass("fa-minus-circle");
+		$index = $(".ingredientlist").length;
+		$clone.find("input").each(function(){
+			$(this).attr("name", ($(this).attr("name").replace(/\[([0-9]+)\]/g, "[" + $index + "]")));
+		});
+		$(".ingredientlist_type").append($clone);
+		$(".ingredientlist:last input").val('');
+		return false;
+	});
+	
+	$(document).on("click", ".remove-ingredient", function(){
+		$add_ingredient = $(".add-ingredient").clone();
+		$(this).parents(".ingredientlist").slideUp(function(){ $(this).remove(); });
+		return false;
+	});
+	
+	//Allow only numbers and dot for price
+	$(document).on("keypress", ".allowOnlyPrice", function(e){
+		if(!((e.which >= 48 && e.which <= 57) || e.which == 46))
+			return false;
+	});
+	
+	//Form Submission
+		$(document).on("click", "#submit_form", function(e){
+			$error = false;
+			
+			if($(".ingredientlist").length > 1 && parseInt($(".ingredient_list_option:checked").val()))
+			{
+				$(".ingredientlist").each(function(){
+					$index = $(this).index();
+					
+					//Ingredient Name Validation
+					$elementToCompare = $(this).find("input:first");
+					$elementDuplicate = false;
+					$valueToCompare = $(this).find("input:first").val();
+					$nameToCompare = $(this).find("input:first").attr("name");
+					
+					$element = ".ingredientlist:not(:eq(" + $index + "))";
+					$($element).each(function(){
+						if(($valueToCompare == $(this).find("input:first").val()) && ($nameToCompare != $(this).find("input:first").attr("name")) && ($(this).find("input:first").val().length > 0))
+						{
+							$(this).find("input:first").addClass("has-error").css("border-color", "#A94442").attr("title", 'Duplicate Ingredient Name');
+							$error = true;
+							$elementDuplicate = true;
+						}
+					});
+					
+					if($elementDuplicate)
+						$($elementToCompare).addClass("has-error").css("border-color", "#A94442").attr("title", 'Duplicate Ingredient Name');
+					else
+					{
+						//Empty Validation - Ingredient Name
+						if($(this).find("input:first").val().length == 0)
+						{
+							$(this).find("input:first").addClass("has-error").css("border-color", "#A94442").attr("title", 'Ingredient Name Cannot be empty');
+							$error = true;
+						}
+						else
+							$($elementToCompare).removeClass("has-error").attr('title', '').css('border-color', '#e5e9ec');
+					}
+				});	
+			}
+			else
+			{
+				//Empty Validation - Ingredient Name
+				if(parseInt($("input[name='ingredient_list']:checked").val()))
+				{
+					if($(".ingredientlist").find("input:first").val().length == 0)
+					{
+						$(".ingredientlist").find("input:first").addClass("has-error").css("border-color", "#A94442").attr("title", 'Ingredient Name Cannot be empty');
+						$error = true;
+					}
+				}
+			}
+			
+			//Number Validation - Ingredient Price
+			$(".allowOnlyPrice").each(function(){
+				if($(this).val().length != 0)
+				{
+					//Numeric and Positive Value Validation
+					if((!$.isNumeric($(this).val())) ||(parseFloat($(this).val()) < 0))
+					{
+						$(this).addClass("has-error").css("border-color", "#A94442").attr("title", 'Ingredient Price must be a positive number');
+						$error = true;
+					}
+					else
+						$(this).removeClass("has-error").css("border-color", "#e5e9ec").attr("title", '');
+				}
+				else
+					$(this).removeClass("has-error").css("border-color", "#e5e9ec").attr("title", '');
+				
+			});
+			
+			if($error)
+			{ 
+				e.preventDefault(e); 
+			}
+			else
+			{
+				return true;
+			}
+		});
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $('input[type="radio"]').click(function(){
+        if($(this).attr("value")=="1"){
+            $(".ingredientlist_type").css('display', 'block');
+        }
+        if($(this).attr("value")=="0"){
+          
+		   $(".ingredientlist_type").css('display', 'none');
+        }
+        
+    });
+});
+</script>	 
+<script type="text/javascript">
+
+function setchangeimg(val)
+{ 
+	$('#txt_changeprofileimage').html(val);}
+	$(document).on("change", "#upload_img", function () { 
+	console.log("The text has been changed.");
+	var file = this.files[0];  
+	var imagefile = file.type;  
+	var match= ["image/jpeg","image/png","image/jpg"];
+	if(!((imagefile==match[0]) || (imagefile==match[1]) || (imagefile==match[2])))
+	{
+		document.getElementById('error_msg').innerHTML = 'The image must be a file of type: jpg, jpeg, png';
+		return false;
+	}
+	else
+	{
+		document.getElementById('error_msg').innerHTML = '';
+		var reader = new FileReader();
+		reader.onload = imageIsLoaded;
+		reader.readAsDataURL(this.files[0]);
+	}
+	$("#txt_changeprofileimage").html(file.name);
+});
+
+function imageIsLoaded(e) 
+{  
+	var image = new Image(); 
+	image.src = e.target.result;   
+	image.onload = function() {
+		$(".roundedimg").attr('src', e.target.result);
+	}
+}
+</script>
+<?php
+function showvalidmsg($i, $array_valid)
+{
+	$active = '';
+	if($i == 0)
+	{
+		$active = ($array_valid[$i] != '') ? 'active' : '';
+	}
+	else
+	{
+		$j = $i-1;	
+		$active = ($array_valid[$i] != '' && $array_valid[$j] == '') ? 'active' : '';
+	}
+	return $active;
+}
+?>
+<?php $__env->stopSection(); ?>     
+
+<?php echo $__env->make('adminheader', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

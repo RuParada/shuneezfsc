@@ -1,0 +1,373 @@
+<?php $__env->startSection('content'); ?>
+<?php if(Session::has('error')): ?> <?php $error = Session::get('error'); ?> <?php endif; ?>
+<?php $array_valid = (Session::has('array_valid')) ? Session::get('array_valid') : []; ?>
+<div class="content-wrapper">
+
+	<section class="content-header">
+		<h1><?php echo trans('messages.Add Deliveryboy'); ?> </h1>
+		<?php if( Session::has('dook_error') ): ?> <p class="error_msg"> <?php echo Session('dook_error'); ?> </p> <?php endif; ?>
+	</section>
+
+	<!-- Main content -->
+	<section class="content product">
+	<div class="row margin0">
+	<?php echo Form::open(array('url' => 'admin/adddeliveryboy', 'files' => 1)); ?>
+
+	<div class="box no_top_border">
+		<div class="nav-tabs-custom ">
+			<ul class="nav nav-tabs">
+				<?php
+				if(count($languages) > 0)
+				{
+					$i = 0;
+					foreach($languages as $language) {
+						if(count($array_valid)){
+							$active = showvalidmsg($i, $array_valid);
+				?>
+				<li class="<?php echo $active; ?>"><a href="#<?php echo $language->code; ?>" data-toggle="tab"><?php echo ucfirst($language->language); ?></a></li>
+				<?php } else { ?>
+				<li class="<?php echo ($i == 0) ? 'active' : ''; ?>"><a href="#<?php echo $language->code; ?>" data-toggle="tab"><?php echo ucfirst($language->language); ?></a></li>
+				<?php } $i++; } } ?>
+			</ul>
+			<div class="tab-content">
+			<?php
+			if(count($languages) > 0)
+			{
+				$i = 0;
+				foreach($languages as $language) {
+					if(count($array_valid)){
+					$active = showvalidmsg($i, $array_valid);		
+			?>
+			<div class="<?php echo $active; ?> tab-pane" id="<?php echo $language->code; ?>">
+			<?php } else { ?>
+			<div class="<?php echo ($i == 0) ? 'active' : ''; ?> tab-pane" id="<?php echo $language->code; ?>">
+			<?php } ?>
+				<div class="col-md-12">
+					<div class="box">
+						<div class="box-header with-border">
+							 <h3 class="box-title"><?php echo ucfirst($language->language); ?></h3>
+						</div> <!-- box-header -->
+				
+						<div class="box-body col-md-6">
+							<div class="form-group">
+								<label><?php echo trans('messages.Name'); ?> <span class="req">*</span> :</label>
+								<input type="text" class="form-control" name="name[]" placeholder="<?php echo trans('messages.Enter Delivery name'); ?> " value="<?php echo Input::old('name')[$i]; ?>">
+								<input type="hidden" name="language[]" value="<?php echo $language->code; ?>">
+								<?php if(count($array_valid)): ?><p class="error_msg"><?php echo ($array_valid[$i] != '') ? trans('messages.Name field is required') : ''; ?></p><?php endif; ?>
+							</div><!-- form-group -->
+						</div><!-- box-body -->  
+					</div>
+				</div> <!-- col-md-6 -->		
+			</div>
+			<?php $i++; } } ?>
+		
+			</div> <!-- tab-content -->
+		
+		</div> <!-- nav-tabs-custom -->
+		<div class="col-md-12">
+				<div class="box">
+						<div class="box-header with-border">
+							 <h3 class="box-title"><?php echo trans('messages.Details'); ?></h3>
+						</div> <!-- box-header -->
+                  <div class="box-body">
+					  <div class="form-group full_selectList col-md-6">
+						<label class="col-sm-3 control-label"><?php echo trans('messages.Branch'); ?> <span class="req">*</span> :</label>
+						<div class="col-sm-8">
+							<select class="selectLists" name="branch" id="branch" onchange="getTeam();">
+								<option value=""><?php echo trans('Select Branch'); ?></option>
+								<?php if(count($branches) > 0) { 
+									foreach($branches as $branch) {
+										$select = selectdrop(Input::old('branch'), $branch->id);
+								?>
+								<option value="<?php echo $branch->id; ?>" <?php echo $select; ?>><?php echo $branch->branch; ?></option>
+								<?php } } ?>
+							</select>
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('branch') != '') ? $error->first('branch') : ''; ?></p><?php endif; ?>
+						</div>
+					</div><!-- form-group -->
+					<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-3 control-label"><?php echo trans('messages.Email'); ?> :</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="email" placeholder="<?php echo trans('messages.Email'); ?>" value="<?php echo Input::old('email'); ?>">
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('email') != '') ? $error->first('email') : ''; ?></p><?php endif; ?>
+						</div>
+					</div><!-- form-group -->
+					</div><!-- box-body -->
+					
+					<div class="box-body">
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Mobile'); ?> <span class="req">*</span> :</label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="mobile" placeholder="<?php echo trans('messages.Mobile'); ?>" value="<?php echo Input::old('mobile'); ?>">
+								<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('mobile') != '') ? $error->first('mobile') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Address'); ?> :</label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="address" placeholder="<?php echo trans('messages.Address'); ?>" value="<?php echo Input::old('address'); ?>">
+								<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('address') != '') ? $error->first('address') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+					</div><!-- box-body -->   
+					
+					<div class="box-body">
+					
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Password'); ?> <span class="req">*</span> :</label>
+							<div class="col-sm-8">
+								<input type="password" class="form-control" name="password" placeholder="<?php echo trans('messages.Password'); ?>" value="">
+								<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('password') != '') ? $error->first('password') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Status'); ?> <span class="req">*</span> :</label>
+							<div class="col-sm-8">
+								<select class="selectLists" name="status">
+									<option value="1"><?php echo trans('messages.Active'); ?></option>
+									<option value="0" <?php echo (Input::old('status') == '0') ? 'selected' : ''; ?>><?php echo trans('messages.Inactive'); ?></option>
+								</select>
+								<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('status') != '') ? $error->first('status') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+					</div><!-- box-body -->  
+					<div class="box-body">
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Vehicle Type'); ?> :</label>
+							<div class="col-sm-8">
+							<select class="selectLists" name="vehicle_type" id="vehicle_type">
+								<option value=""><?php echo trans('messages.Select Vehicle'); ?></option>
+								<option value="1" <?php echo (Input::old('vehicle_type') == '1') ? 'selected' : ''; ?>><?php echo trans('messages.Motor Bike'); ?></option>
+								<option value="2" <?php echo (Input::old('vehicle_type') == '2') ? 'selected' : ''; ?>><?php echo trans('messages.Sedan'); ?></option>
+								<option value="3" <?php echo (Input::old('vehicle_type') == '3') ? 'selected' : ''; ?>><?php echo trans('messages.Suv'); ?></option>
+								<option value="4" <?php echo (Input::old('vehicle_type') == '4') ? 'selected' : ''; ?>><?php echo trans('messages.Pickup'); ?></option>
+								<option value="5" <?php echo (Input::old('vehicle_type') == '5') ? 'selected' : ''; ?>><?php echo trans('messages.Van'); ?></option>
+							</select>
+							</div>
+						</div><!-- form-group -->
+
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Vehicle Attribute'); ?> :</label>
+							<div class="col-sm-8">
+								<select class="selectLists" name="vehicle_attribute" id="vehicle_type">
+									<option value=""><?php echo trans('messages.Select Attribute'); ?></option>
+									<option value="hot food" <?php echo (Input::old('vehicle_attribute') == 'hot food') ? 'selected' : ''; ?>><?php echo trans('messages.Hot food'); ?></option>
+									<option value="fridge" <?php echo (Input::old('vehicle_attribute') == 'fridge') ? 'selected' : ''; ?>><?php echo trans('messages.Fridge'); ?></option>
+								</select>
+							</div>
+						</div><!-- form-group -->
+					</div><!-- box-body --> 
+
+					<div class="box-body">
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Select Country'); ?> :</label>
+							<div class="col-sm-8">
+							<select class="selectLists" name="country" id="country" onchange="getcity();">
+                                <option value=""><?php echo trans('messages.Select City'); ?></option>
+                                <?php if(count($countries) > 0) { 
+                                    foreach($countries as $country) {
+                                        $select = selectdrop(Input::old('country'), $country->id);
+                                ?>
+                                <option value="<?php echo $country->id; ?>" <?php echo $select; ?>><?php echo $country->name->en; ?></option>
+                                <?php } } ?>
+                            </select>
+                            <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('country') != '') ? $error->first('country') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Select City'); ?> :</label>
+							<div class="col-sm-8">
+								<select class="selectLists" name="city" id="city">
+                                    <option value=""><?php echo trans('Select City'); ?></option>
+                                </select>
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('city') != '') ? $error->first('city') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+					</div><!-- box-body --> 
+
+					<div class="box-body">
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Commission Percent'); ?> <span class="req">*</span> :</label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="commission_percent" placeholder="<?php echo trans('messages.Commission Percent'); ?>" value="<?php echo Input::old('commission_percent'); ?>">
+								<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('commission_percent') != '') ? $error->first('commission_percent') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Team'); ?> <span class="req">*</span> :</label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="team" placeholder="<?php echo trans('messages.Select branch 1st'); ?>" value="<?php echo Input::old('team'); ?>" readonly id="team">
+								<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('team_id') != '') ? $error->first('team_id') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+					</div><!-- box-body --> 
+
+					<div class="box-body">
+						<div class="form-group upload_image col-sm-6">
+							<label class="full_row" for="image"><?php echo trans('messages.Image'); ?>:</label>
+							<input type="file" class="form-control" id="upload_img" name="image">
+							<label for="upload_img" class="upload_lbl">
+								<img src="<?php echo URL::to('assets/admin/images/not-found.png'); ?>" class="roundedimg">
+							</label>
+							<p id="error_msg" class="error_msg"></p>
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('image') != '') ? $error->first('image') : ''; ?></p><?php endif; ?>
+						</div><!-- form-group -->
+					</div>              
+              </div>
+			</div> <!-- col-md-12 -->
+	
+	<div class="box-footer">
+		<input type="hidden" name="team_id" id="team_id" value="<?php echo Input::old('team_id'); ?>">
+		<input type="hidden" name="type" value="1">
+		<button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o"></i><?php echo trans('messages.Save Deliveryboy'); ?></button>
+		<button type="reset" class="btn pull-right"><i class="fa fa-refresh"></i><?php echo trans('messages.Clear'); ?></button>
+		<button type="button" onclick="window.location.href='<?php echo URL::to('admin/deliveryboys'); ?>'" class="btn pull-right"><i class="fa fa-chevron-left"></i><?php echo trans('messages.Cancel'); ?></button>
+    </div>
+	<?php echo Form::close(); ?>	
+	</div> <!-- box -->
+	</div>	
+    </section><!-- content -->
+
+</div><!-- content-wrapper -->
+<div class="modal"></div>
+<?php 
+function selectdrop($val1, $val2)
+{
+	$select = ($val1 == $val2) ? 'selected' : '';
+	return $select; 
+}
+?>	 
+<script type="text/javascript">
+
+function setchangeimg(val)
+{ 
+	$('#txt_changeprofileimage').html(val);}
+	$(document).on("change", "#upload_img", function () { 
+	console.log("The text has been changed.");
+	var file = this.files[0];  
+	var imagefile = file.type;  
+	var match= ["image/jpeg","image/png","image/jpg"];
+	if(!((imagefile==match[0]) || (imagefile==match[1]) || (imagefile==match[2])))
+	{
+		document.getElementById('error_msg').innerHTML = 'The image must be a file of type: jpg, jpeg, png';
+		return false;
+	}
+	else
+	{
+		document.getElementById('error_msg').innerHTML = '';
+		var reader = new FileReader();
+		reader.onload = imageIsLoaded;
+		reader.readAsDataURL(this.files[0]);
+	}
+	$("#txt_changeprofileimage").html(file.name);
+});
+function imageIsLoaded(e) 
+{  
+	var image = new Image(); 
+	image.src = e.target.result;   
+	image.onload = function() {
+		$(".roundedimg").attr('src', e.target.result);
+	}
+}
+
+function getcity()
+{
+    var country_id = $("#country option:selected").val();
+    if( country_id != '' ) {
+	    $.ajax({
+	        beforeSend: function () {
+	            $("body").addClass("loading");
+	        },
+	        type: "GET",
+	        dataType: "json",
+	        url: "<?php echo URL::to('admin/get-dook-city'); ?>",
+	        data: {'country_id': country_id},
+	        async: true,
+	        success: function (result) {
+	            document.getElementById("select2-city-container").innerHTML = "Select City";
+	            $("#city").html(result.citylist);
+	            $("body").removeClass("loading");
+	        }
+	    });
+	}
+	else {
+		document.getElementById("select2-city-container").innerHTML = "Select City";
+	    $("#city").html('');
+	}
+
+}
+
+function getTeam()
+{
+    var branch_id = $("#branch option:selected").val();
+    if( branch_id != '' ) {
+	    $.ajax({
+	        beforeSend: function () {
+	            $("body").addClass("loading");
+	        },
+	        type: "GET",
+	        dataType: "json",
+	        url: "<?php echo URL::to('admin/get-branch-team'); ?>",
+	        data: {'branch_id': branch_id},
+	        async: true,
+	        success: function (result) {
+	            $("#team").val(result.team);
+	            $("#team_id").val(result.teamId);
+	            $("body").removeClass("loading");
+	        }
+	    });
+	}
+	else {
+		$("#team").val('');
+	    $("#team_id").val('');
+	}
+}
+
+</script>
+<?php
+function showvalidmsg($i, $array_valid)
+{
+	$active = '';
+	if($i == 0)
+	{
+		$active = ($array_valid[$i] != '') ? 'active' : '';
+	}
+	else
+	{
+		$j = $i-1;	
+		$active = ($array_valid[$i] != '' && $array_valid[$j] == '') ? 'active' : '';
+	}
+	return $active;
+}
+?>
+<style>
+    .modal {
+        display:    none;
+        position:   fixed;
+        z-index:    1000;
+        top:        0;
+        left:       0;
+        height:     100%;
+        width:      100%;
+        background: rgba( 255, 255, 255, .8 ) 
+            url('http://i.stack.imgur.com/FhHRx.gif') 
+            50% 50% 
+            no-repeat;
+    }
+
+
+    body.loading {
+        overflow: hidden;   
+    }
+
+    body.loading .modal {
+        display: block;
+    }
+</style>
+<?php $__env->stopSection(); ?>     
+
+
+<?php echo $__env->make('adminheader', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

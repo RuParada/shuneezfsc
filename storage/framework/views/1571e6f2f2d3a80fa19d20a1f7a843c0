@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SHUNEEZ | Log in</title>    
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <?php echo Html::style('assets/admin/css/bootstrap.min.css'); ?>
+
+    <?php echo Html::style('assets/admin/css/font-awesome.min.css'); ?>
+
+    <?php echo Html::style('assets/admin/css/AdminLTE.min.css'); ?>	
+    <!--[if lt IE 9]>
+		<script src="assets/js/html5shiv.min.js"></script>
+        <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <?php if(Session::has('login_error')): ?> <?php $error = Session::get('login_error') ?> <?php endif; ?>
+  <?php if(Session::has('login_check')): ?> <?php $login_check = Session::get('login_check') ?> <?php endif; ?>
+  <body class="hold-transition login-page">
+ 
+    <div class="login-box">
+      
+	  <div class="login-logo"> Login in to <b>SHUNEEZ</b> </div>
+	 
+      <div class="login-box-body">
+        <?php if(Session::has('login_check')): ?><p class="error_msg"><?php echo $login_check; ?></p><?php endif; ?>  
+        <?php if(Session::has('succ_msg')): ?><p class="error_msg"><?php echo Session('succ_msg'); ?></p><?php endif; ?>     
+        <?php echo Form::open(array('url' => 'admin/login')); ?>
+
+          <div class="form-group has-feedback">
+            <input type="text" class="form-control" placeholder="Username/Email" name="username" value="<?php echo Input::old('username'); ?>">
+            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+            <?php if(Session::has('login_error')): ?><p class="error_msg"><?php echo ($error->first('username') != '') ? $error->first('username') : ''; ?></p><?php endif; ?>
+          </div>
+          <div class="form-group has-feedback">
+            <input type="password" class="form-control" placeholder="Password" name="password">
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            <?php if(Session::has('login_error')): ?><p class="error_msg"><?php echo ($error->first('password') != '') ? $error->first('password') : ''; ?></p><?php endif; ?>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <span class="login_btn"><button type="submit" class="btn btn-primary btn-block btn-flat">Log in</button>
+            </div><!-- /.col -->
+          </div>
+        <?php echo Form::close(); ?>		
+      </div><!-- /.login-box-body -->
+	  <a href="#" class="forgot" data-toggle="modal" data-target="#myModal">I forgot my password</a>
+    </div><!-- /.login-box -->
+	
+<!-- Forgot Password -->
+<div class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Forgot Password</h4>
+      </div>
+	  
+	  <?php echo Form::open(array('url' => 'forgotpassword')); ?>
+
+		  <div class="modal-body">        
+			  <div class="form-group has-feedback">
+				<input type="text" name="email" class="form-control" placeholder="Email" required>
+				<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+			  </div>         
+		  </div>
+		  <div class="modal-footer forgot_btn">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<button type="submit" class="btn btn-primary">Sent Email</button>	
+		  </div>
+	  <?php echo Form::close(); ?>
+
+    </div>
+  </div>
+</div>	
+
+    <?php echo Html::script('assets/admin/js/jQuery-2.1.4.min.js'); ?>
+
+    <?php echo Html::script('assets/admin/js/bootstrap.min.js'); ?>
+
+	
+  </body>
+</html>

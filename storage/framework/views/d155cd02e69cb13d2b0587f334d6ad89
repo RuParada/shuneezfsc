@@ -1,0 +1,583 @@
+<?php
+use App\Category;
+?>
+
+<?php $__env->startSection('content'); ?>
+<?php if(Session::has('error')): ?> <?php $error = Session::get('error'); ?> <?php endif; ?>
+<?php $array_valid = (Session::has('array_valid')) ? Session::get('array_valid') : []; ?>
+<div class="content-wrapper">
+
+	<section class="content-header">
+		<h1><?php echo trans('messages.Edit Vendor Item'); ?> </h1>
+	</section>
+
+	<!-- Main content -->
+	<section class="content product">
+	<div class="row margin0">
+	<?php echo Form::open(array('url' => 'admin/updatevendoritem', 'files' => 1)); ?>
+
+	<div class="box no_top_border">
+		<div class="col-md-12">
+				<div class="box">
+					<div class="box-body">
+					<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-3 control-label"><?php echo trans('messages.Vendor'); ?> <span class="req">*</span> :</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="vendor" value="<?php echo $vendor->vendor_name; ?>" readonly>
+							<input type="hidden" name="vendor_id" value="<?php echo $vendor->vendor_id; ?>">
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('vendor') != '') ? $error->first('vendor') : ''; ?></p><?php endif; ?>
+						</div>
+					</div><!-- form-group -->
+					<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-4 control-label"><?php echo trans('messages.Category'); ?> <span class="req">*</span> :</label>
+						<div class="col-sm-8">
+							<select class="selectLists" name="category" id="category" onchange="getsubcategories();">
+								<option value=""></option>
+								<?php if(count($categories) > 0) { 
+									foreach($categories as $category) {
+										$select = (Input::old('category') != '') ? selectdrop(Input::old('category'), $category->id) : selectdrop($item->category_id, $category->id);
+								?>
+								<option value="<?php echo $category->id; ?>" <?php echo $select; ?>><?php echo $category->category; ?></option>
+								<?php } } ?>
+							</select>
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('category') != '') ? $error->first('category') : ''; ?></p><?php endif; ?>
+						</div>
+					</div><!-- form-group -->
+					<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-3 control-label"><?php echo trans('messages.Cuisine'); ?> <span class="req">*</span> :</label>
+						<div class="col-sm-8">
+							<select class="selectLists" name="cuisine" id="cuisine">
+								<option value=""></option>
+								<?php if(count($cuisines) > 0) { 
+									foreach($cuisines as $cuisine) {
+										$select = (Input::old('cuisine') != '') ? selectdrop(Input::old('cuisine'), $cuisine->id) : selectdrop($item->cuisine_id, $cuisine->id);
+								?>
+								<option value="<?php echo $cuisine->id; ?>" <?php echo $select; ?>><?php echo $cuisine->cuisine; ?></option>
+								<?php } } ?>
+							</select>
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('cuisine') != '') ? $error->first('cuisine') : ''; ?></p><?php endif; ?>
+						</div>
+					</div><!-- form-group -->
+					<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-4 control-label"><?php echo trans('messages.Subcategory'); ?> <span class="req">*</span> :</label>
+						<div class="col-sm-8">
+							<select class="selectLists" name="subcategory" id="subcategory_id">
+								<option value=""></option>
+								<?php if(count($subcategories) > 0) { 
+									foreach($subcategories as $subcategory) {
+										$select = (Input::old('subcategory') != '') ? selectdrop(Input::old('subcategory'), $subcategory->id) : selectdrop($item->subcategory_id, $subcategory->id);
+								?>
+								<option value="<?php echo $subcategory->id; ?>" <?php echo $select; ?>><?php echo $subcategory->subcategory; ?></option>
+								<?php } } ?>
+							</select>
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('subcategory') != '') ? $error->first('subcategory') : ''; ?></p><?php endif; ?>
+						</div>
+					</div><!-- form-group -->
+				
+						
+					</div><!-- box-body -->                
+              </div>
+			</div> <!-- col-md-12 -->
+		<div class="nav-tabs-custom ">
+			<ul class="nav nav-tabs">
+				<?php
+				if(count($languages) > 0)
+				{
+					$i = 0;
+					foreach($languages as $language) {
+						if(count($array_valid)){
+							$active = showvalidmsg($i, $array_valid);
+				?>
+				<li class="<?php echo $active; ?>"><a href="#<?php echo $language->code; ?>" data-toggle="tab"><?php echo ucfirst($language->language); ?></a></li>
+				<?php } else { ?>
+				<li class="<?php echo ($i == 0) ? 'active' : ''; ?>"><a href="#<?php echo $language->code; ?>" data-toggle="tab"><?php echo ucfirst($language->language); ?></a></li>
+				<?php } $i++; } } ?>
+			</ul>
+			<div class="tab-content">
+			<?php
+			if(count($languages) > 0)
+			{
+				$i = 0;
+				foreach($languages as $language) {
+					$item_name = DB::table('vendor_item_description')->where('item_id', $item->id)->where('language', $language->code)->first();
+					if(count($array_valid)){
+						$active = showvalidmsg($i, $array_valid);		
+			?>
+			<div class="<?php echo $active; ?> tab-pane" id="<?php echo $language->code; ?>">
+			<?php } else { ?>
+			<div class="<?php echo ($i == 0) ? 'active' : ''; ?> tab-pane" id="<?php echo $language->code; ?>">
+			<?php } ?>
+				<div class="col-md-12">
+					<div class="box">
+						<div class="box-header with-border">
+							 <h3 class="box-title"><?php echo ucfirst($language->language); ?></h3>
+						</div> <!-- box-header -->
+				
+						<div class="box-body col-md-12">
+							<div class="form-group col-md-6">
+								<label><?php echo trans('messages.Name'); ?> <span class="req">*</span> :</label>
+								<input type="text" class="form-control" name="item_name[]" placeholder="<?php echo trans('messages.Enter Item Name'); ?>" value="<?php echo (Input::old('item_name')[$i] != '') ? Input::old('item_name')[$i] : $item_name->item_name; ?>">
+								<input type="hidden" name="language[]" value="<?php echo $language->code; ?>">
+								<?php if(count($array_valid)): ?><p class="error_msg"><?php echo ($array_valid[$i] != '') ? trans('messages.Name field is required') : ''; ?></p><?php endif; ?>
+							</div><!-- form-group -->
+							
+							<div class="form-group col-md-6">
+								<label><?php echo trans('messages.Description'); ?> :</label>
+								<textarea class="form-control" name="item_description[]" placeholder="<?php echo trans('messages.Enter Item description'); ?>"><?php echo (Input::old('item_description')[$i] != '') ? Input::old('item_description')[$i] : $item_name->item_description; ?></textarea>
+							</div><!-- form-group -->
+						</div><!-- box-body -->                
+				   </div>
+				</div> <!-- col-md-6 -->		
+			</div>
+			<?php $i++; } } ?>
+		
+			</div> <!-- tab-content -->
+		
+		</div> <!-- nav-tabs-custom -->
+		<div class="col-md-12">
+				<div class="box">
+						<div class="box-header with-border">
+							 <h3 class="box-title"><?php echo trans('messages.Details'); ?></h3>
+						</div> <!-- box-header -->
+					
+						<div class="box-body">
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Price'); ?> <span class="req">*</span> :</label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="price" placeholder="<?php echo trans('messages.Price'); ?>" value="<?php echo (Input::old('price') != '') ? Input::old('price') : $item->price; ?>">
+								<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('price') != '') ? $error->first('price') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Weight'); ?>:</label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="weight" placeholder="<?php echo trans('messages.Weight'); ?>" value="<?php echo (Input::old('weight') != '') ? Input::old('weight') : $item->weight; ?>">
+								<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('weight') != '') ? $error->first('weight') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+						</div><!-- box-body -->  
+						
+						<div class="box-body">
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Unit'); ?> <span class="req">*</span> :</label>
+							<div class="col-sm-8">
+								<select class="selectLists" name="unit" id="unit">
+								<option value=""></option>
+								<option value="g" <?php echo (Input::old('unit') == 'g' || $item->units == 'g') ? 'selected' : ''; ?>><?php echo trans('messages.gram'); ?></option>
+								<option value="kg" <?php echo (Input::old('unit') == 'kg' || $item->units == 'kg') ? 'selected' : ''; ?>><?php echo trans('messages.kilogram'); ?></option>
+								<option value="pieces" <?php echo (Input::old('unit') == 'pieces' || $item->units == 'pieces') ? 'selected' : ''; ?>><?php echo trans('messages.pieces'); ?></option>
+								<option value="people" <?php echo (Input::old('unit') == 'people' || $item->units == 'people') ? 'selected' : ''; ?>><?php echo trans('messages.people'); ?></option>
+							</select>
+							</div>
+						</div><!-- form-group -->
+
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Serve For'); ?><span class="req">*</span> :</label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="serve_for" placeholder="<?php echo trans('messages.Serve For'); ?>" value="<?php echo (Input::old('serve_for') != '') ? Input::old('serve_for') : $item->serve_for; ?>">
+								<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('serve_for') != '') ? $error->first('serve_for') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+						</div><!-- box-body -->  
+						
+						<div class="box-body">
+						<div class="form-group full_selectList col-md-6">
+							<label class="col-sm-3 control-label"><?php echo trans('messages.Preparation Time'); ?> <span class="req">*</span> :</label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="preparation_time" placeholder="<?php echo trans('messages.Preparation Time'); ?>" value="<?php echo (Input::old('preparation_time') != '') ? Input::old('preparation_time') : $item->preparation_time; ?>">
+								<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('preparation_time') != '') ? $error->first('preparation_time') : ''; ?></p><?php endif; ?>
+							</div>
+						</div><!-- form-group -->
+
+						<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-3 control-label"><?php echo trans('messages.Availability'); ?> <span class="req">*</span> :</label>
+						<div class="col-sm-8">
+							<select class="selectLists" name="availability">
+								<option value="1"><?php echo trans('messages.Yes'); ?></option>
+								<option value="0" <?php echo (Input::old('availability') == '0' || $item->availability == 0) ? 'selected' : ''; ?>><?php echo trans('messages.No'); ?></option>
+							</select>
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('availability') != '') ? $error->first('availability') : ''; ?></p><?php endif; ?>
+						</div>
+					</div><!-- form-group -->
+						</div><!-- box-body -->   
+                
+					<div class="box-body">
+					<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-3 control-label"><?php echo trans('messages.Featured'); ?> <span class="req">*</span> :</label>
+						<div class="col-sm-8">
+							<select class="selectLists" name="featured">
+								<option value="1"><?php echo trans('messages.Yes'); ?></option>
+								<option value="0" <?php echo (Input::old('featured') == '0' || $item->featured == 0) ? 'selected' : ''; ?>><?php echo trans('messages.No'); ?></option>
+							</select>
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('featured') != '') ? $error->first('featured') : ''; ?></p><?php endif; ?>
+						</div>
+					</div><!-- form-group -->
+
+					<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-3 control-label"><?php echo trans('messages.Status'); ?> <span class="req">*</span> :</label>
+						<div class="col-sm-8">
+							<select class="selectLists" name="status">
+								<option value="1"><?php echo trans('messages.Active'); ?></option>
+								<option value="0" <?php echo (Input::old('status') == '0' || $item->status == 0) ? 'selected' : ''; ?>><?php echo trans('messages.Inactive'); ?></option>
+							</select>
+							<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('status') != '') ? $error->first('status') : ''; ?></p><?php endif; ?>
+						</div>
+					</div><!-- form-group1 -->
+					</div>
+					
+					<div class="box-body">
+					<div class="form-group upload_image col-sm-6">
+						<label class="full_row" for="image"><?php echo trans('messages.Image'); ?>:</label>
+						<input type="file" class="form-control" id="upload_img" name="image">
+						<label for="upload_img" class="upload_lbl">
+							<img src="<?php echo URL::to(($item->image != '') ? 'assets/uploads/vendor_items/' .$item->image : 'assets/admin/images/not-found.png'); ?>" class="roundedimg">
+						</label>
+						<p id="error_msg" class="error_msg"></p>
+						<?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('image') != '') ? $error->first('image') : ''; ?></p><?php endif; ?>
+					</div><!-- form-group -->
+				
+						
+					</div><!-- box-body --> 
+					
+					<div class="box-body">
+					<div class="form-group full_selectList col-md-6">
+						<label class="col-sm-7 control-label"><?php echo trans('messages.Want to add list of Ingredients'); ?>:</label>
+						<div class="col-sm-5">
+							<input type="radio" class="ingredient_list_option" checked name="is_ingredients" value="1" > <?php echo trans('messages.Yes'); ?>
+							<input type="radio" class="ingredient_list_option" <?php echo ($item->is_ingredients == 0) ? 'checked' : ''; ?> name="is_ingredients" value="0"><?php echo trans('messages.No'); ?>
+						</div>
+					</div><!-- form-group -->
+					</div><!-- box-body -->
+					<div class="ingredientlist_type" style="display:<?php echo ($item->is_ingredients == 1) ? 'block': 'none'; ?>">
+					<?php if(count($item_ingredients) > 0) {  
+						$i = 1;
+						foreach($item_ingredients as $itemingredient) { 
+							$ingredienlists = DB::table('vendor_item_ingredientlist')
+											->join('ingredientlist_description', 'vendor_item_ingredientlist.item_ingredientlist_id', '=', 'ingredientlist_description.ingredientlist_id')
+											->SelectRaw(DB::getTablePrefix().'vendor_item_ingredientlist.*,'.DB::getTablePrefix().'ingredientlist_description.ingredientlist_name as ingredientlist, '.DB::getTablePrefix().'ingredientlist_description.ingredientlist_id')
+											->where('vendor_item_ingredientlist.item_ingredient_id', $itemingredient->id)
+											->where('ingredientlist_description.language', 'en') 
+											->get();
+						?>
+						<div class="list_type">
+							<div class="box-body ingredient_type"> 
+								<div class="form-group full_selectList col-md-12">
+									<label class="col-sm-2 control-label"><?php echo trans('messages.Ingredient Type'); ?>  <span class="req">*</span> :</label>
+									<div class="col-sm-5">
+										<select class="selectLists" name="ingredient[]" level="<?php echo $i; ?>" onchange="getingredientlist(this);">
+											<option value=""></option>
+											<?php 
+											if(count($ingredients) > 0) { 
+												foreach($ingredients as $ingredient) {
+													$select = ($ingredient->id == $itemingredient->ingredient_id) ? 'selected' : '';
+													?>
+											<option value="<?php echo $ingredient->id; ?>" <?php echo $select; ?>><?php echo $ingredient->ingredient; ?></option>
+													<?php 
+												} 
+											} ?>
+										</select>
+									</div>
+								</div><!-- form-group -->
+							</div>
+							<?php
+							if(count($ingredienlists) > 0)
+							{
+								foreach($ingredienlists as $ingredienlist)
+								{
+								?>
+							<div class="box-body ingredientlist" id="ingredientlist<?php echo $i; ?>">
+								<div class="form-group full_selectList col-md-3">
+									<div class="col-sm-12">
+										<input type="text" class="form-control col-md-3" placeholder="<?php echo trans('messages.Ingredient Name'); ?>" value="<?php echo $ingredienlist->ingredientlist; ?>"/>
+										<input type="hidden" name="ingredient_list_id[<?php echo $itemingredient->ingredient_id; ?>][]" value="<?php echo $ingredienlist->ingredientlist_id; ?>">
+									</div>
+								</div>
+								<div class="form-group full_selectList col-md-3">
+									<div class="col-sm-12">
+										<input type="text" class="form-control col-md-3 allowOnlyPrice" placeholder="<?php echo trans('messages.Price'); ?>" name="item_price[]" value="<?php echo $ingredienlist->price; ?>"/>
+									</div>
+								</div>
+								<a href="javascript:void(0);" class="remove-ingredient" title="<?php echo trans('messages.remove'); ?>" style="color:#C20C0C">
+									<i class="fa fa-minus-circle fa-fw"></i>
+								</a>
+							</div>
+								<?php } 
+							} ?>
+						<div class="box-body minmax" id="minmax<?php echo $i; ?>">
+							<div class="form-group full_selectList col-md-3">
+								<div class="col-sm-12">
+									<input type="text" class="form-control col-md-3" value="<?php echo $itemingredient->minimum; ?>" placeholder="<?php echo trans('messages.Minimum'); ?>" name="minimum[]"/>
+								</div>
+							</div>
+							<div class="form-group full_selectList col-md-3">
+								<div class="col-sm-12">
+									<input type="text" class="form-control col-md-3 allowOnlyPrice" value="<?php echo $itemingredient->maximum; ?>" placeholder="<?php echo trans('messages.Maximum'); ?>" name="maximum[]"/>
+								</div>
+							</div>
+							<div class="form-group full_selectList col-md-3">
+								<div class="col-sm-12">
+									<input type="checkbox" value="1" name="required[]" <?php echo ($itemingredient->required == 1) ? 'checked' : ''; ?>/> <?php echo trans('messages.required'); ?> 
+								</div>
+							</div>
+						</div>
+						<button type="button" id="add" class="remove"><?php echo trans('messages.Delete Item'); ?></button>
+						
+						<?php $i++; } ?>
+					</div>
+						<?php } ?>
+					<div class="list_type">
+							<div class="box-body ingredient_type"> 
+								<div class="form-group full_selectList col-md-12">
+									<label class="col-sm-2 control-label"><?php echo trans('messages.Ingredient Type'); ?>  <span class="req">*</span> :</label>
+									<div class="col-sm-5">
+										<select class="selectLists" name="ingredient[]" level='<?php echo $i; ?>' onchange="getingredientlist(this);" >
+											<option value=""></option>
+											<?php if(count($ingredients) > 0) { 
+												foreach($ingredients as $ingredient) {
+												?>
+											<option value="<?php echo $ingredient->id; ?>"><?php echo $ingredient->ingredient; ?></option>
+												<?php } 
+											} ?>
+										</select>
+									</div>
+								</div><!-- form-group -->
+							</div>
+							<div class="box-body ingredientlist" id="ingredientlist<?php echo $i; ?>">
+							</div>
+							<div class="box-body minmax" id="minmax<?php echo $i; ?>"></div>
+							<button type="button" id="add" class="add" disabled="disabled"><?php echo trans('messages.Add Ingredients'); ?></button>
+						</div> <!-- col-md-12 -->
+					</div>
+	<div class="box-footer">
+		<input type="hidden" name="id" value="<?php echo $item->id; ?>">
+		<button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o"></i><?php echo trans('messages.Update Item'); ?></button>
+		<button type="reset" class="btn pull-right"><i class="fa fa-refresh"></i><?php echo trans('messages.Reset'); ?></button>
+		<button type="button" onclick="window.location.href='<?php echo URL::to('admin/vendoritems'); ?>'" class="btn pull-right"><i class="fa fa-chevron-left"></i><?php echo trans('messages.Cancel'); ?></button>
+    </div>
+	<?php echo Form::close(); ?>	
+	</div> <!-- box -->
+	</div>	
+    </section><!-- content -->
+
+</div><!-- content-wrapper -->
+<div class="modal_load"></div>	
+<?php 
+function selectdrop($val1, $val2)
+{
+	$select = ($val1 == $val2) ? 'selected' : '';
+	return $select; 
+}
+?>	 
+<script type="text/javascript">
+
+function setchangeimg(val)
+{ 
+	$('#txt_changeprofileimage').html(val);}
+	$(document).on("change", "#upload_img", function () { 
+	console.log("The text has been changed.");
+	var file = this.files[0];  
+	var imagefile = file.type;  
+	var match= ["image/jpeg","image/png","image/jpg"];
+	if(!((imagefile==match[0]) || (imagefile==match[1]) || (imagefile==match[2])))
+	{
+		document.getElementById('error_msg').innerHTML = 'The image must be a file of type: jpg, jpeg, png';
+		return false;
+	}
+	else
+	{
+		document.getElementById('error_msg').innerHTML = '';
+		var reader = new FileReader();
+		reader.onload = imageIsLoaded;
+		reader.readAsDataURL(this.files[0]);
+	}
+	$("#txt_changeprofileimage").html(file.name);
+});
+
+function imageIsLoaded(e) 
+{  
+	var image = new Image(); 
+	image.src = e.target.result;   
+	image.onload = function() {
+		$(".roundedimg").attr('src', e.target.result);
+	}
+}
+
+function getcategories()
+{
+	//alert('hi');
+    var vendor_id = $( "#vendor option:selected" ).val();
+    $.ajax({
+    beforeSend : function() {
+    	$("body").addClass("loading");
+    },
+    type : "GET",
+    dataType : "json",
+    url  : "<?php echo URL::to('admin/getvendorcategories'); ?>",
+    data : {'vendor_id' : vendor_id},
+    async: true,
+    success: function(result) {
+    			$("#category").html(result.category);
+    			$("#cuisine").html(result.cuisine);
+    			$("body").removeClass("loading");
+    		}
+    	});
+}
+
+function getsubcategories()
+{
+	var category_id = $( "#category option:selected" ).val();
+    $.ajax({
+    beforeSend : function() {
+    	$("body").addClass("loading");
+    },
+    type : "GET",
+    dataType : "json",
+    url  : "<?php echo URL::to('admin/getvendorsubcategories'); ?>",
+    data : {'category_id' : category_id},
+    async: true,
+    success: function(result) {
+				$("#subcategory_id").html(result.subcategories);
+    			$("body").removeClass("loading");
+    		}
+    	});
+}
+
+var ingredients = new Array();  
+function getingredientlist(thiss)
+{ 
+	
+		var level = ($(thiss).attr('level'));
+		var ingredient_id = $( thiss ).val();
+		$.ajax({
+		beforeSend : function() {
+			$("body").addClass("loading");
+		},
+		type : "GET",
+		dataType : "json",
+		url  : "<?php echo URL::to('admin/getingredientlist'); ?>",
+		data : {'ingredient_id' : ingredient_id},
+		async: true,
+		success: function(result) {
+					$("#ingredientlist"+level).html(result.ingredientlist);
+					$("#minmax"+level).html(result.minmax);
+					$(".add").removeAttr('disabled');
+					$("body").removeClass("loading");
+				}
+			});
+}
+
+$(document).ready(function(){
+	
+	$(document).on("click", ".add", function(){
+		var count = $(".selectLists:last").attr('level') +1;
+		$clone = $(".list_type:last").clone();
+		$(".selectLists").select2("destroy");
+		$(".list_type").find('.add:last').attr('class','remove').html('Delete Item');
+		$(".ingredientlist_type").append($clone);
+		$(".list_type:last").find('.selection:last').remove();
+		$(".list_type:last").find('.ingredientlist').html('');
+		$(".list_type:last").find('.ingredientlist:last').attr('id', 'ingredientlist'+count);
+		$(".list_type:last").find('.minmax:last').attr('id', 'minmax'+count);
+		$(".list_type:last").find('.selectLists:last').attr('level', count);
+		$(".list_type:last").find('.minmax:last').html('');
+		$(".list_type").find('.add').attr('disabled','disabled');
+		$(".selectLists").select2();
+		return false;
+	});
+	
+	$(document).on("click", ".remove", function(){
+		$(this).parents(".list_type").slideUp(function(){ $(this).remove(); });
+		return false;
+	});
+
+	$('input[type="radio"]').click(function(){
+        if($(this).attr("value")=="1"){
+            $(".ingredientlist_type").css('display', 'block');
+        }
+        if($(this).attr("value")=="0"){
+          
+		   $(".ingredientlist_type").css('display', 'none');
+        }
+        
+    });
+    
+    $(document).on("click", ".add-ingredient", function(){
+		$clone = $(".ingredientlist:last").clone();
+		$clone.find(".remove_button").remove();
+		if($(this).siblings().hasClass("remove_button"))
+		$(this).remove();
+		$(this).siblings(".remove-list").remove();
+		$(".ingredientlist a").attr("title", "remove");	
+		$(".ingredientlist a").removeClass("add-ingredient").addClass("remove-ingredient").css("color", "#C20C0C");
+		$(".ingredientlist a i").removeClass("fa-plus-circle").addClass("fa-minus-circle");
+		$index = $(".ingredientlist").length;
+		$clone.find("input").each(function(){
+			$(this).attr("name", ($(this).attr("name").replace(/\[([0-9]+)\]/g, "[" + $index + "]")));
+		});
+		$(".ingredientlist_type").append($clone);
+		return false;item1_ar
+	});
+	
+	$(document).on("click", ".remove-ingredient", function(){
+		//$add_ingredient = $(".add-ingredient").clone();
+		$(this).parent(".ingredientlist").slideUp(function(){ $(this).remove(); });
+		return false;
+	});
+	
+	$('input[type="radio"]').click(function(){
+        if($(this).attr("value")=="1"){
+            $(".ingredientlist_type").css('display', 'block');
+        }
+        if($(this).attr("value")=="0"){
+          
+		   $(".ingredientlist_type").css('display', 'none');
+        }
+        
+    });
+});
+</script>
+
+<style>
+.modal_load {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url(<?php echo URL::to('assets/images/loading.gif'); ?>) 
+                50% 50% 
+                no-repeat;
+}
+
+
+body.loading {
+    overflow: hidden;   
+}
+
+body.loading .modal_load {
+    display: block;
+}
+</style>
+<?php
+function showvalidmsg($i, $array_valid)
+{
+	$active = '';
+	if($i == 0)
+	{
+		$active = ($array_valid[$i] != '') ? 'active' : '';
+	}
+	else
+	{
+		$j = $i-1;	
+		$active = ($array_valid[$i] != '' && $array_valid[$j] == '') ? 'active' : '';
+	}
+	return $active;
+}
+?>
+<?php $__env->stopSection(); ?>     
+
+<?php echo $__env->make('adminheader', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

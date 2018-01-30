@@ -1,0 +1,181 @@
+<?php $__env->startSection('content'); ?>
+
+<?php if(Session::has('error')): ?> <?php $error = Session::get('error'); ?> <?php endif; ?>
+<div class="content-wrapper">
+
+    <section class="content-header">
+        <h1><?php echo trans('messages.Add Pickup Point'); ?> </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-8">
+
+                <div class="box">
+
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><?php echo trans('messages.Fill the below fields'); ?></h3>
+                    </div><!--box-header-->
+
+                    <?php echo Form::open(array('url' => 'admin/create-pickup-point', 'class' => 'form-horizontal')); ?>
+
+                    <div class="box-body">
+                    	<div class="form-group full_selectList">
+                            <label class="col-sm-3 control-label"><?php echo trans('messages.Team'); ?> <span class="req">*</span> :</label>
+                            <div class="col-sm-9">
+                                <select class="selectLists" name="team_id" id="team">
+                                    <option value=""><?php echo trans('messages.Select Team'); ?></option>
+                                    <?php if( count($teams) ): ?>
+	                                    <?php foreach($teams as $team): ?>
+	                                        <option value="<?php echo $team->dook_id; ?>" <?php echo ($team->dook_id == Input::old('team_id')) ? 'selected' : ''; ?>><?php echo $team->name; ?></option>
+	                                    <?php endforeach; ?>
+                                	<?php endif; ?>
+                                </select>
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('team_id') != '') ? $error->first('team_id') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div><!-- form-group -->
+
+                        <div class="form-group">
+                            <label for="first_name" class="col-sm-3 control-label"><?php echo trans('messages.Title'); ?> <span class="req">*</span></label>
+                            <div class="col-sm-9">
+                                <input type="text" maxlength='30' name="title" class="form-control" id="title" placeholder="<?php echo trans('messages.Title'); ?> " value="<?php echo (Input::old('title')) ? Input::old('title') : ''; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('title') != '') ? $error->first('title') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact_name" class="col-sm-3 control-label"><?php echo trans('messages.Contact Person Name'); ?> <span class="req">*</span></label>
+                            <div class="col-sm-9">
+                                <input type="text" maxlength='50' name="contact_name" class="form-control" id="title" placeholder="<?php echo trans('messages.Contact Person Name'); ?> " value="<?php echo (Input::old('contact_name')) ? Input::old('contact_name') : ''; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('contact_name') != '') ? $error->first('contact_name') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone" class="col-sm-3 control-label"><?php echo trans('messages.Phone'); ?> <span class="req">*</span></label>
+                            <div class="col-sm-9">
+                                <input type="text" maxlength='30' name="phone" class="form-control" id="phone" placeholder="<?php echo trans('messages.Phone'); ?> " value="<?php echo (Input::old('phone')) ? Input::old('phone') : ''; ?>">
+                                <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('phone') != '') ? $error->first('phone') : ''; ?></p><?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full_selectList">
+                            <label class="col-sm-3 control-label"><?php echo trans('messages.Address'); ?> :</label>
+                                <div class="col-md-9">
+                                    <input type="text" name="address" id="search_address" class="form-control col-md-4" value="" >
+                                </div>
+                        </div>
+                        <div id="map-canvas" style="width: 100%; height: 400px;"></div>
+
+                        <div class="form-group">
+                                <label class="col-sm-3 control-label"><?php echo trans('messages.Latitude'); ?> <span class="req">*</span> :</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="latitude" id="latitude" class="form-control" value="<?php echo (Session::has('error')) ? Input::old('latitude') : ''; ?>" >
+                                    <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('latitude') != '') ? $error->first('latitude') : ''; ?></p><?php endif; ?>
+                                </div>
+                            </div><!-- form-group -->
+
+                        <div class="form-group">
+                                <label class="col-sm-3 control-label"><?php echo trans('messages.Longitude'); ?> <span class="req">*</span> :</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="longitude" id="longitude" class="form-control" value="<?php echo (Session::has('error')) ? Input::old('longitude') : ''; ?>" >
+                                    <?php if(Session::has('error')): ?><p class="error_msg"><?php echo ($error->first('longitude') != '') ? $error->first('longitude') : ''; ?></p><?php endif; ?>
+                                </div>
+                            </div><!-- form-group -->
+                    </div><!--box-body-->
+
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-floppy-o"></i><?php echo trans('messages.Save Pickup Point'); ?></button>
+                        <button type="reset" class="btn pull-right"><i class="fa fa-refresh"></i><?php echo trans('messages.Clear'); ?></button>
+                        <button type="button" onclick="window.location.href = '<?php echo URL::to('admin/teams'); ?>'" class="btn pull-right"><i class="fa fa-chevron-left"></i><?php echo trans('messages.Cancel'); ?></button>
+                    </div><!-- box-footer -->
+                    <?php echo Form::close(); ?>
+
+
+                </div><!--box-info-->
+
+            </div></div>	  
+
+    </section><!-- /.content -->
+</div><!-- /.content-wrapper -->
+<div class="modal"></div>
+<script type="text/javascript">
+$(document).ready(function()
+{
+$('#map-canvas').locationpicker({
+
+    location: {latitude: <?php echo (Input::old('latitude') != '') ? Input::old('latitude') : 11.0168; ?>, longitude: <?php echo (Input::old('longitude') != '') ? Input::old('longitude') : 76.9558; ?>},
+    radius: 300,
+    onchanged: function (currentLocation, radius, isMarkerDropped) {
+        var addressComponents = $(this).locationpicker('map').location.addressComponents;
+        //updateControls(addressComponents);
+    },
+    oninitialized: function(component) {
+        var addressComponents = $(component).locationpicker('map').location.addressComponents;
+        //updateControls(addressComponents);
+    },
+    inputBinding: {
+    latitudeInput: $('#latitude'),
+    longitudeInput: $('#longitude')       
+    }
+});
+function initialize() {
+    var input = document.getElementById('search_address');
+    var autocomplete = new google.maps.places.Autocomplete(input);
+    google.maps.event.addListener(autocomplete, 'place_changed', function () {
+        var place = autocomplete.getPlace();
+        /*document.getElementById('city2').value = place.name;*/
+        document.getElementById('latitude').value = place.geometry.location.lat();
+        document.getElementById('longitude').value = place.geometry.location.lng();
+            var latitude = place.geometry.location.lat();
+            var longitude = place.geometry.location.lng();
+
+            $('#map-canvas').locationpicker({
+                location: {latitude: latitude, longitude: longitude},
+                radius: 300,
+                onchanged: function (currentLocation, radius, isMarkerDropped) {
+                    var addressComponents = $(this).locationpicker('map').location.addressComponents;
+                    //updateControls(addressComponents);
+                },
+                oninitialized: function(component) {
+                    var addressComponents = $(component).locationpicker('map').location.addressComponents;
+                    //updateControls(addressComponents);
+                },
+                inputBinding: {
+                latitudeInput: $('#latitude'),
+                longitudeInput: $('#longitude')       
+                }
+            });
+    });
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+});
+</script>
+<style>
+    .modal {
+        display:    none;
+        position:   fixed;
+        z-index:    1000;
+        top:        0;
+        left:       0;
+        height:     100%;
+        width:      100%;
+        background: rgba( 255, 255, 255, .8 ) 
+            url('http://i.stack.imgur.com/FhHRx.gif') 
+            50% 50% 
+            no-repeat;
+    }
+
+
+    body.loading {
+        overflow: hidden;   
+    }
+
+    body.loading .modal {
+        display: block;
+    }
+</style>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('adminheader', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

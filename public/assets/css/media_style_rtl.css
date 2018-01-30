@@ -1,0 +1,219 @@
+@media only screen and (min-width: 240px) and (max-width: 767px)
+{
+    ul.my_acc_pos_rel 
+  {
+    padding-right: 0px;
+    position: relative;
+    text-align: center;
+  }
+  
+    .hme-menu ul li:nth-child(1) 
+    {
+      border: none!important;
+    }
+    .hme-sel 
+    {
+      cursor: pointer;
+      background: none;
+      background-image: url(../img/drop-down-white.png);
+      background-repeat: no-repeat;
+      background-position: 2px!important;
+      width: 70px!important;
+      border: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+    .hme-logo 
+    {
+        margin: 0 auto;
+        padding-top: 20px;
+        float: none;
+        margin-left: none;
+    }
+    .foot-mnu li {
+        display: inline-block;
+        list-style: none;
+        border-left:none!important;
+        line-height: 15px;
+        padding-left: 15px;
+        padding-right: 15px;
+        line-height:2!important;
+        width:100%;
+    }
+    ul.foot-mnu{
+        padding-left:0px!important;}
+       .social-share ul{padding-left:0px!important;}
+       .foot-mnu{margin-top:15px;margin-bottom:15px;}
+       .tex_cen{text-align: center;}
+       .inner-logo {padding-top: 20px;margin: 0 auto;}
+       .inner-menu
+        {
+            width: 102%!important;
+            padding-top: 20px!important;
+        }
+    .innerbanner-section 
+    {
+        background: url(../img/inner-bg.png) no-repeat center top;padding: 0px 0px 0px 0px;
+        position: relative;
+        background-size: cover;
+        height: 250px !important;
+        overflow: hidden;
+    }
+    .nav.nav-tabs.custom_ckout li.active a, .nav.nav-tabs.custom_ckout li 
+    {
+       /*width: 100%;*/
+        text-align: center;
+        /*background: #39b449;*/
+        color: #fff!important;
+        font-size: 13px!important;
+        border-radius: 0;
+    }
+    .ck_1 {padding-left: 0px !important;}
+    .ck_2 {padding-left: 0px !important;}
+    .mn
+    {
+        height: 52px;
+        width: 43px;
+        text-align: center;
+    }
+    .checkout-minusbtn {
+    background-color: #999;
+    border-radius: 2px;
+    border: none;
+    color: #fff;
+    width: 20px;
+    width: 24px;
+    height: 24px;
+    /* margin-top: -36px; */
+    position: relative;
+    top: -14px;
+}
+.checkout-plusbtn {
+    background-color: #999;
+    border-radius: 2px;
+    border: none;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    top: -24px;
+}
+input[type=checkbox].css-checkbox + label.css-label-chekup 
+    {
+        padding-left: 30px!important;
+        margin-bottom:15px;
+        display: inline-block;
+        line-height: 20px;
+        background-repeat: no-repeat;
+        background-position: 0 0;
+        font-size: 14px!important;
+        vertical-align: middle;
+        cursor: pointer;
+    }
+    .down-mobile {width: 100%;padding:0px!important;}
+    .ver_txt{float:none!important;margin-top:5px;text-align: center!important;margin-bottom:10px;}
+}
+
+@media only screen and (min-width: 768px) and (max-width: 993px) 
+{
+    .foot_img{margin-bottom:20px;}
+    .del-btn-rt {margin-right: 208px!important;}
+    .ver_txt{float:none!important;margin-top:5px;text-align: center!important;margin-bottom:10px;}
+}
+
+
+@media only screen and (max-width:320px)
+{
+    .hme-menu ul li 
+    {
+        display: inline-block;
+        list-style: none;
+        border-right: 1px solid #fff!important;
+        padding-right: 10px;
+        padding-left: 10px;
+        line-height: 12px;
+        color: #fff;
+    }
+    .hme-menu 
+    {
+        width: 101%!important;
+        padding-top: 35px;
+    }
+
+    .inner-menu 
+    {
+        width: 102%!important;
+    }
+    .inner-menu ul li
+    {
+        display: inline-block;
+        list-style: none;
+        border-right: 1px solid #fff;
+        padding-right: 10px!important;
+        padding-left: 10px!important;
+        line-height: 16px!important;
+        color: #fff;
+    }
+    .add_wdth {width: 60%!important;}
+    .mob_fld{float: right;width:22%!important;}
+    .mob_fld1{float: left;width:78%!important;}
+    input[type=radio].css-checkbox + label.css-label-homechk {
+    padding-left: 25px;
+    height: 18px;
+    display: inline-block;
+    line-height: 18px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    font-size: 12px;
+    vertical-align: middle;
+    cursor: pointer;
+    color: #fff;
+    font-weight: normal;
+    font-family: 'Open Sans', sans-serif;
+    margin-right: 10px;
+}
+
+    /*Modal Dialog
+    .modal-dialog{max-width:300px!important;}
+    .loginmodal-container{margin:0!important;}*/
+
+
+}
+@media only screen and (max-width:1024px)
+{
+    .aa
+    {
+        float: right;
+        width: 60px!important;
+        height: 60px!important;
+        overflow: hidden;
+    }
+    .plusbtn_n1
+    {
+        background-color: #adadad;
+        border-radius: 2px;
+        border: none;
+        color: #fff;
+        width: 24px;
+        height: 24px;
+    }
+    .minusbtn_n1 {
+        background-color: #adadad;
+        border-radius: 2px;
+        border: none;
+        color: #fff;
+        width: 20px;
+        width: 24px;
+        height: 24px;
+    }
+    .del-btn-rt {margin-right: 156px!important;}
+    .total-txt1 {
+    color: #672d93;
+    font-size: 16px!important;
+}
+.total-txt {
+    font-size: 14px!important;
+    color: #666;
+}
+}
